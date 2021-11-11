@@ -1,0 +1,55 @@
+<main>
+  <div
+    class="
+      flex
+      col
+      padding-small
+      text-center
+      w-full
+      justify-center
+      absolute
+      top-1/4
+    "
+    *ngIf="!playlistOpen"
+  >
+    <h1 class="m-4 text-6xl">{{ appTitle }}</h1>
+    <h2 class="mb-6 text-2xl text-muted">Get started</h2>
+
+    <div class="flex row justify-center">
+      <button
+        (click)="newPlaylist()"
+        class="background-success"
+        style="margin-right: 1rem"
+      >
+        New Playlist
+      </button>
+      <plm-file-picker
+        (fileChange)="openPlaylist($event)"
+        [filesTypesAccepted]="FILE_ACCEPT_PLAYLIST"
+        [class]="'background-secondary'"
+      >
+        Open Playlist
+      </plm-file-picker>
+    </div>
+  </div>
+
+  <div class="flex col padding-small container" *ngIf="playlistOpen">
+    <header>
+      <plm-header (closePlaylist)="onClosePlaylist()"></plm-header>
+    </header>
+    <main>
+      <div *ngIf="!((songs$ | async).length > 0)">Load Songs...</div>
+      <plm-playlist
+        class="d-contents"
+        *ngIf="(songs$ | async).length > 0"
+      ></plm-playlist>
+      <router-outlet></router-outlet>
+    </main>
+<!--
+    <footer class="row flex-edges">
+      <plm-player class="d-contents" [song]="currentSong"></plm-player>
+    </footer>
+-->
+    <footer></footer>
+  </div>
+</main>

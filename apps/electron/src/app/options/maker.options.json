@@ -1,0 +1,14 @@
+{
+  "$schema": "../../../../../node_modules/nx-electron/src/validation/maker.schema.json",
+  "productName": "Playlist Maker",
+  "copyright": "Copyright © 2021 year Denis Zholob",
+  "icon": "global/assets/playlist-maker-icon.png",
+  "fileAssociations": {
+    "ext": [
+      "m3u"
+    ]
+  },
+  "win": {
+    "icon": "global/assets/playlist-maker-icon.png"
+  }
+}

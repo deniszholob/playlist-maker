@@ -1,0 +1,102 @@
+<div class="row flex-edges margin-none">
+  <div class="d-inline-block">
+    <button
+      (click)="fileInput.click()"
+      class="background-success"
+      [disabled]="areSongsLoading"
+    >
+      <span *ngIf="!areSongsLoading">Open Song(s)</span>
+      <span *ngIf="areSongsLoading">
+        <i class="fas fa-spinner fa-spin"></i>
+        Songs Loading...
+      </span>
+    </button>
+    <!-- https://stackoverflow.com/questions/42355858/input-file-onchange-event-not-firing -->
+    <input
+      #fileInput
+      type="file"
+      multiple
+      hidden
+      onclick="this.value = null"
+      (change)="openFiles($event)"
+      accept="{{ filesAccepted }}"
+    />
+  </div>
+  <h1 class="text-center">
+    <button
+      [attr.aria-label]="'Close this playlist'"
+      data-balloon-pos="down"
+      class="text-red btn-small"
+      (click)="onClosePlaylist()"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+    {{ playlistPath }}
+  </h1>
+  <button
+    (click)="save()"
+    [attr.aria-label]="
+      areSongsValid
+        ? 'Save to ' + playlistPath
+        : 'Will save some songs with invalid locations'
+    "
+    data-balloon-pos="left"
+    [ngClass]="
+      areSongsValid ? 'background-secondary' : 'background-warning-dark'
+    "
+  >
+    <i class="fas fa-exclamation" *ngIf="!areSongsValid"></i>
+    Save
+  </button>
+  <!-- <button>Save New</button> -->
+</div>
+
+<div class="row flex-edges margin-none">
+  <ng-container *ngIf="renderRelativeSelection">
+    <fieldset class="form-group margin-none">
+      <!-- <legend>Path Types</legend> -->
+      <label for="pathsRelative" class="paper-radio">
+        <input
+          type="radio"
+          name="paths"
+          id="pathsRelative"
+          [value]="true"
+          [ngModel]="relativePaths"
+          (ngModelChange)="updatePaths($event)"
+        />
+        <span>Relative Paths</span>
+      </label>
+      <label for="pathsAbsolute" class="paper-radio">
+        <input
+          type="radio"
+          name="paths"
+          id="pathsAbsolute"
+          [value]="false"
+          [ngModel]="relativePaths"
+          (ngModelChange)="updatePaths($event)"
+        />
+        <span>Absolute Paths</span>
+      </label>
+    </fieldset>
+  </ng-container>
+
+  <ng-container *ngIf="renderRelativeSelection">
+    <div class="row flex-spaces margin-none">
+      <div class="alert alert-secondary row" *ngIf="relativePaths">
+        <i class="fas fa-info-circle fa-2x"></i>
+        <span class="padding-left">
+          Songs will be found relative to the playlist file
+          <br />If its moved, songs will not be able to be found
+        </span>
+      </div>
+      <div class="alert alert-secondary row" *ngIf="!relativePaths">
+        <i class="fas fa-info-circle fa-2x"></i>
+        <span class="padding-left">
+          Songs will be found relative to the drive
+          <br />Playlist can be moved inside the drive and songs will be found,
+          but if drive changes, songs will not be found
+        </span>
+      </div>
+    </div>
+  </ng-container>
+</div>

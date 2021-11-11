@@ -1,0 +1,79 @@
+@import '~papercss/dist/paper.css';
+@import '~@fortawesome/fontawesome-free/css/all';
+@import 'tooltip';
+@import 'util';
+
+html.dark body {
+  background: var(--main-background);
+}
+
+h1 {
+  font-size: 1rem;
+  // border-bottom: 1px dashed #d9d9d8;
+  font-style: italic;
+  margin-top: 0;
+  padding: 0.5rem 0;
+  overflow-wrap: break-word;
+}
+
+.alert.row {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.vertical-center {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.img-thumbnail {
+  width: 40px;
+  height: auto;
+}
+
+tr td {
+  border-top: 1 px dashed #d9d9d8;
+  line-height: 1.5;
+  padding: 8 px;
+  vertical-align: top;
+}
+
+table tbody tr td {
+  vertical-align: middle;
+  cursor: move;
+}
+
+.cdk-drag-preview {
+  border: dashed 1px var(--secondary);
+  background-color: rgba($color: #000000, $alpha: 0.1);
+  td {
+    display: none;
+  }
+}
+
+.song-check {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+table {
+  // display: block;
+  width: 100%;
+  border-spacing: 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  display: block;
+  width: 100%;
+}
+
+.flex-no-wrap {
+  flex-wrap: nowrap;
+}
+
+.cdk-drag-placeholder {
+  background-color: var(--shadow-color-hover);
+  border: none;
+}

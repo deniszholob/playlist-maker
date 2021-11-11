@@ -1,0 +1,271 @@
+# CI/CD for Github Actions
+# @author Denis Zholob (deniszholob.com)
+# ====================================== #
+
+name: Build Test Deploy
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [main]
+  # pull_request:
+  #   branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  get-release-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17.0'
+
+      - name: Set RELEASE_VERSION env var
+        run: node -pe "require('./package.json').version" > RELEASE_VERSION.txt
+
+      - name: Archive RELEASE_VERSION
+        uses: actions/upload-artifact@v2
+        with:
+          name: RELEASE_VERSION
+          path: RELEASE_VERSION.txt
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17.0'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+
+      - name: Install NPM Dependencies
+        run: npm run i
+
+      - name: Cache Nx
+        uses: actions/cache@v2
+        with:
+          path: node_modules/.cache/nx
+          key: cache-nx-${{ hashFiles('package.json') }}-build-web-${{ github.sha }}
+          restore-keys: |
+            cache-nx-${{ hashFiles('package.json') }}-
+
+      - name: Build
+        run: npm run build:web
+
+      # Save dist artifacts for deployment jobs
+      # https://docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions#sharing-data-between-jobs
+      - name: Archive web demo build
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: web-demo-build
+          path: dist/apps/web # Directory to push to GitHub Pages
+
+  build-windows:
+    runs-on: windows-latest
+    needs: [get-release-version, build-web]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17.0'
+
+      - name: Download RELEASE_VERSION
+        uses: actions/download-artifact@v2
+        with:
+          name: RELEASE_VERSION
+
+      - name: Set RELEASE_VERSION env var
+        shell: bash
+        run: |
+          echo "RELEASE_VERSION=`cat RELEASE_VERSION.txt`" >> $GITHUB_ENV
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{runner.os}}-${{env.cache-name}}-${{hashFiles('**/package.json')}}
+
+      - name: Install NPM Dependencies
+        run: npm run i
+
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: web-demo-build
+          path: dist/apps/web
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: dist/apps/web
+
+      - name: Build Windows Package
+        run: npm run build:electron && npm run electron:make
+
+      - name: Display structure of built files
+        run: ls -R
+        working-directory: dist/executables
+
+      # - name: Zip Release
+      #   uses: thedoctor0/zip-release@master
+      #   with:
+      #     type: 'zip'
+      #     filename: Playlist Maker ${{env.RELEASE_VERSION}}.zip
+      #     path: dist/executables/win-unpacked/
+
+      - name: Zip Release
+        uses: papeloto/action-zip@v1
+        with:
+          files: dist/executables/win-unpacked/
+          dest: Playlist Maker ${{env.RELEASE_VERSION}}.zip
+
+      - name: Archive electron app build
+        # if: github.event == 'push' && success()
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-package-${{env.RELEASE_VERSION}}
+          path: |
+            dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe
+            ./Playlist Maker ${{env.RELEASE_VERSION}}.zip
+          if-no-files-found: error
+
+  # Ref: https://focisolutions.com/2020/04/github-actions-deploying-an-angular-app/
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: build-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: web-demo-build
+          path: web-demo-build
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: web-demo-build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          BRANCH: gh-pages
+          FOLDER: web-demo-build
+
+  # Ref: https://github.com/actions/create-release
+  release:
+    # if: github.event == 'push'
+    runs-on: ubuntu-latest
+    needs: [get-release-version, build-windows]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17.0'
+
+      - name: Download RELEASE_VERSION
+        uses: actions/download-artifact@v2
+        with:
+          name: RELEASE_VERSION
+
+      - name: Set RELEASE_VERSION env var
+        shell: bash
+        run: |
+          echo "RELEASE_VERSION=`cat RELEASE_VERSION.txt`" >> $GITHUB_ENV
+
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: release-package-${{env.RELEASE_VERSION}}
+          path: release-package-${{env.RELEASE_VERSION}}
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: release-package-${{env.RELEASE_VERSION}}
+
+      # ====================================================================== #
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Playlist Maker v${{env.RELEASE_VERSION}}
+          tag: v${{env.RELEASE_VERSION}}
+          body: |
+            Playlist Maker Windows desktop app.
+            * Click on this Release
+            * Expand the Assets below.
+            * Run either the setup installer `Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe` or extract the `Playlist.Maker.${{env.RELEASE_VERSION}}.zip` contents.
+            * Antivirus will probably freak out for a couple seconds, it does for me.
+          artifacts: "release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip"
+          artifactErrorsFailBuild: true
+          draft: false # true to create a draft (unpublished) release, false to create a published one. Default: false
+
+      # ====================================================================== #
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     name: Playlist Maker v${{env.RELEASE_VERSION}}
+      #     tag_name: v${{env.RELEASE_VERSION}}
+      #     body: |
+      #       Playlist Maker Windows desktop app.
+      #       * Click on this Release
+      #       * Expand the Assets below.
+      #       * Run either the setup installer Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe or extract the Playlist.Maker.${{env.RELEASE_VERSION}}.zip contents.
+      #       * Antivirus will probably freak out for a couple seconds, it does for me.
+      #     files: |
+      #       release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe
+      #       release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip
+      #     fail_on_unmatched_files: true
+      #     draft: true # true to create a draft (unpublished) release, false to create a published one. Default: false
+
+      # ====================================================================== #
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   with:
+      #     tag_name: ${{env.RELEASE_VERSION}}
+      #     release_name: Playlist Maker ${{env.RELEASE_VERSION}}
+      #     body: |
+      #       Windows desktop app.
+      #       Saves data in non encrypted files only.
+
+      #       Expand the Assets below.
+      #       Run either the setup installer Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe or extract the Playlist.Maker.${{env.RELEASE_VERSION}}.zip contents.
+      #       Antivirus will probably freak out for a couple seconds, it does for me.
+      #     draft: true # true to create a draft (unpublished) release, false to create a published one. Default: false
+      #     prerelease: true # true to identify the release as a prerelease. false to identify the release as a full release. Default: false
+
+      # # Ref: https://github.com/actions/upload-release-asset
+      # - name: Upload Release Asset
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+      #     asset_path: release-package-${{env.RELEASE_VERSION}}
+      #     asset_name: release-package-${{env.RELEASE_VERSION}}
+      #     asset_content_type: application/zip

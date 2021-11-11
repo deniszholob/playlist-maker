@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "angular.ng-template",
+    "nrwl.angular-console",
+    "esbenp.prettier-vscode",
+    "firsttris.vscode-jest-runner",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    "pkief.material-icon-theme",
+    "bradlc.vscode-tailwindcss",
+    "heybourn.headwind",
+    "csstools.postcss",
+    "adrianwilczynski.toggle-hidden"
+  ]
+}

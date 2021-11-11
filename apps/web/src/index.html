@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" class="d-contents dark">
+  <head>
+    <!-- Meta Data -->
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Language" content="en_US" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Denis Zholob" />
+    <meta
+      name="keywords"
+      content="Denis, Zholob, Playlist Maker, open source, app, music, songs"
+    />
+    <meta name="title" content="Playlist Maker" />
+    <meta name="description" content="PLaylist Maker app" />
+
+    <!-- Google / Search Engine Tags -->
+    <meta itemprop="name" content="Playlist Maker" />
+    <meta itemprop="description" content="Playlist Maker App" />
+    <meta itemprop="image" content="assets/playlist-maker-icon.png" />
+
+    <!-- Facebook Meta Tags -->
+    <meta
+      property="og:url"
+      content="https://deniszholob.github.io/playlist-maker/"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Playlist Maker" />
+    <meta property="og:description" content="Playlist Maker App" />
+    <meta property="og:image" content="assets/playlist-maker-icon.png" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Playlist Maker" />
+    <meta name="twitter:description" content="Playlist Maker App" />
+    <meta name="twitter:image" content="assets/playlist-maker-icon.png" />
+
+    <!-- Title/Icon -->
+    <title>Playlist Maker</title>
+    <!-- <link rel="icon" type="image/x-icon" href="favicon.ico" /> -->
+    <link rel="icon" type="image/png" href="assets/playlist-maker-icon.png" />
+    <base href="./" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#32BBFF">
+
+    <!-- Meta Tags Generated via http://heymeta.com -->
+
+    <script>
+      // Needed for song parser module
+      if (global === undefined) {
+        var global = window;
+      }
+    </script>
+  </head>
+  <body class="h-screen">
+    <plm-maker-root>
+      <div class="text-center pt-5">
+        Loading...
+        <div class="fa-3x">
+          <i class="fa fa-spinner fa-spin"></i>
+        </div>
+        <p class="text-muted">
+          If this is loading forever, there may be a bug.
+          <br />
+          Hit <strong>F12</strong> to bring up the Debug console, and
+          <a
+            href="https://github.com/deniszholob/playlist-maker/issues"
+            target="_blank"
+            rel="noopener"
+            >report</a
+          >
+          any errors.
+        </p>
+      </div>
+    </plm-maker-root>
+  </body>
+</html>

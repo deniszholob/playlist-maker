@@ -1,0 +1,62 @@
+.text-red {
+  color: var(--danger-text);
+}
+
+.text-orange {
+  color: var(--warning-text);
+}
+
+.text-green {
+  color: var(--success-text);
+}
+
+.d-contents {
+  display: contents;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.top-1\/4 {
+  top: 25%;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.background-warning-dark {
+  background-color: var(--warning-dark);
+  color: var;
+}

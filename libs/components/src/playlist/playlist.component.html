@@ -1,0 +1,78 @@
+<div class="dnd-container"></div>
+<div class="table-wrap">
+  <table
+    class="table-hover"
+    cdk-table
+    [dataSource]="songs$"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+  >
+    <tr cdk-header-row *cdkHeaderRowDef="tableColumns"></tr>
+    <tr cdk-row *cdkRowDef="let row; columns: tableColumns" cdkDrag></tr>
+
+    <ng-container cdkColumnDef="Action">
+      <th cdk-header-cell *cdkHeaderCellDef>Action</th>
+      <td cdk-cell *cdkCellDef="let song; let i = index">
+        <button class="text-red btn-small" (click)="onDeleteSong(i)">
+          <i class="fas fa-times"></i>
+        </button>
+        <div *ngIf="song.validPath" class="text-green song-check">
+          <i class="fas fa-check"></i>
+        </div>
+        <button
+          *ngIf="!song.validPath"
+          [attr.aria-label]="'Find Missing Song'"
+          data-balloon-pos="up-left"
+          class="text-orange btn-small song-check"
+          (click)="fixSongPath(song)"
+        >
+          <i class="fas fa-exclamation"></i>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container cdkColumnDef="Title">
+      <th cdk-header-cell *cdkHeaderCellDef>Title</th>
+      <td
+        cdk-cell
+        *cdkCellDef="let song; let i = index"
+        class="row vertical-center margin-none"
+      >
+        <i *ngIf="!song.image" class="fas fa-music fa-2x"></i>
+        <img
+          *ngIf="song.image"
+          class="img-thumbnail"
+          src="{{ song.image?.url }}"
+          alt="{{ song.image?.name }}"
+          title="{{ song.image?.description }}"
+        />
+        <small class="padding-left-small f">
+          <span>{{ song.title }}</span>
+          <br />
+          <span class="text-muted">{{ song.artist }}</span>
+        </small>
+      </td>
+    </ng-container>
+
+    <ng-container cdkColumnDef="Duration">
+      <th cdk-header-cell *cdkHeaderCellDef><i class="far fa-clock"></i></th>
+      <td cdk-cell *cdkCellDef="let song; let i = index">
+        {{ song.seconds | formatDuration }}
+      </td>
+    </ng-container>
+
+    <ng-container cdkColumnDef="Album">
+      <th cdk-header-cell *cdkHeaderCellDef>Album</th>
+      <td cdk-cell *cdkCellDef="let song; let i = index">
+        {{ song.album }}
+      </td>
+    </ng-container>
+
+    <ng-container cdkColumnDef="Track">
+      <th cdk-header-cell *cdkHeaderCellDef>Track</th>
+      <td cdk-cell *cdkCellDef="let song; let i = index">
+        {{ song.track }}
+      </td>
+    </ng-container>
+  </table>
+</div>
