@@ -12,8 +12,12 @@
     "
     *ngIf="!playlistOpen"
   >
-    <h1 class="m-4 text-6xl">{{ appTitle }}</h1>
-    <h2 class="mb-6 text-2xl text-muted">Get started</h2>
+    <h1 class="m-4 text-6xl text-muted">{{ appTitle }}</h1>
+    <p class="mb-6 text-2xl">
+      Create or open a playlist file in a
+      <strong>Playlist</strong>
+      folder on your music device
+    </p>
 
     <div class="flex row justify-center">
       <button
@@ -31,6 +35,10 @@
         Open Playlist
       </plm-file-picker>
     </div>
+    <p class="mb-6 text-1xl text-muted">
+      <em>Note:</em> That <strong>Playlist</strong> folder should be next to your
+      <strong>Music</strong> folder
+    </p>
   </div>
 
   <div class="flex col padding-small container" *ngIf="playlistOpen">
@@ -45,7 +53,7 @@
       ></plm-playlist>
       <router-outlet></router-outlet>
     </main>
-<!--
+    <!--
     <footer class="row flex-edges">
       <plm-player class="d-contents" [song]="currentSong"></plm-player>
     </footer>

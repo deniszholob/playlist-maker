@@ -15,7 +15,7 @@ export const FILE_FILTERS_MUSIC: FileFilter[] = [
 export const FILE_FILTERS_PLAYLIST: FileFilter[] = [
   {
     name: 'Playlist',
-    extensions: ['m3u', 'm3u8'],
+    extensions: ['m3u8', 'm3u'],
   },
 ];
 

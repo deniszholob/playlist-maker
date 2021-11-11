@@ -7,6 +7,7 @@ import { utc, duration } from 'moment';
  * Forward-slash paths can be used in Windows as long as
  * * they're not extended-length paths and
  * * don't contain any non-ascii characters.
+ * !Warning: Using / instead of \ is not recognized in some applications -_-
  * @see http://superuser.com/a/176395/6877
  * @see https://github.com/sindresorhus/slash
  */

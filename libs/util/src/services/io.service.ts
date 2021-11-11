@@ -3,7 +3,6 @@ import * as mm from 'music-metadata-browser';
 import { forkJoin, from, fromEvent, Observable, of } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 
-import { slash } from '../data';
 import { FullSongData, Playlist, PlaylistSong, SongImage } from '../models';
 import { PlaylistStoreService } from './playlist-store.service';
 import { RawFileIOService } from './raw-file-io.service';
@@ -37,7 +36,9 @@ export class IoService {
 
   public readPlaylistData(file: File) {
     // console.log(`readPlaylistData() - `, file);
-    const path = file.path ? slash(file.path) : file.name;
+    // Using / instead of \ is not recognized... -_-
+    // const path = file.path ? slash(file.path) : file.name;
+    const path = file.path ? file.path : file.name;
     return this.rawFileIOService
       .readFile({ location: path, file, isMediaFile: false })
       .pipe(
@@ -79,7 +80,12 @@ export class IoService {
     return forkJoin(
       playlist.songData.map((song: FullSongData) => {
         // console.log('Validating ', song);
-        return this.validateSongPath(song.path).pipe(
+        const absSongPath = this.rawFileIOService.convertPath(
+          song.path,
+          playlist.path,
+          false
+        );
+        return this.validateSongPath(absSongPath).pipe(
           map((isValid: boolean): null => {
             song.validPath = isValid;
             return null;
@@ -89,6 +95,7 @@ export class IoService {
     );
   }
 
+  /** Validates absolute path only as relative paths will be wrp to the app location */
   private validateSongPath(path: string): Observable<boolean> {
     return this.rawFileIOService.validateFilePath(path);
   }
@@ -137,7 +144,9 @@ export class IoService {
     // console.log(`readData() - `, file);
     return from(mm.parseBlob(file)).pipe(
       map((data) => {
-        const location = file.path ? slash(file.path) : file.name;
+        // Using / instead of \ is not recognized... -_-
+        // const location = file.path ? slash(file.path) : file.name;
+        const location = file.path ? file.path : file.name;
         const title = data.common.title || file.name;
         const artist = data.common.artist;
         const display = artist ? `${artist} - ${title}` : title;

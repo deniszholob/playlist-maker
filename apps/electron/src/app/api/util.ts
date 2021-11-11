@@ -16,13 +16,11 @@ export function convertPath(
   const isAbsolutePath = isAbsolute(path);
   const relativeDir = parse(basedOnRelativePath).dir;
 
-  return slash(
-    toRelative
-      ? isAbsolutePath
-        ? relative(relativeDir, resolve(path))
-        : path
-      : isAbsolutePath
-      ? path
-      : resolve(relativeDir, path)
-  );
+  return toRelative
+    ? isAbsolutePath
+      ? relative(relativeDir, resolve(path))
+      : path
+    : isAbsolutePath
+    ? path
+    : resolve(relativeDir, path);
 }

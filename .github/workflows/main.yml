@@ -217,11 +217,21 @@ jobs:
           tag: v${{env.RELEASE_VERSION}}
           body: |
             Playlist Maker Windows desktop app.
-            * Click on this Release
-            * Expand the Assets below.
-            * Run either the setup installer `Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe` or extract the `Playlist.Maker.${{env.RELEASE_VERSION}}.zip` contents.
-            * Antivirus will probably freak out for a couple seconds, it does for me.
-          artifacts: "release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip"
+
+            ## Easy Install:
+            * **Expand the _Assets_ below.**
+            * Download the setup installer `Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe`
+            * Double click to install and run.
+
+            ## If you want a "portable"/non-installable node-version:
+            * Download the `Playlist.Maker.${{env.RELEASE_VERSION}}.zip`
+            * Extract the contents into a new folder
+            * Inside the folder double click on the .exe file in the new extracted  folder.
+
+            > Note: Antivirus will probably alert and scan for a couple seconds, it does for me.
+          artifacts: |
+            release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,
+            release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip
           artifactErrorsFailBuild: true
           draft: false # true to create a draft (unpublished) release, false to create a published one. Default: false
 

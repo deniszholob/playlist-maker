@@ -83,15 +83,15 @@
   <ng-container *ngIf="renderRelativeSelection">
     <div class="row flex-spaces margin-none">
       <div class="alert alert-secondary row" *ngIf="relativePaths">
-        <i class="fas fa-info-circle fa-2x"></i>
-        <span class="padding-left">
+        <i class="fas fa-info-circle fa-2x text-primary"></i>
+        <span class="padding-left text-primary">
           Songs will be found relative to the playlist file
           <br />If its moved, songs will not be able to be found
         </span>
       </div>
       <div class="alert alert-secondary row" *ngIf="!relativePaths">
-        <i class="fas fa-info-circle fa-2x"></i>
-        <span class="padding-left">
+        <i class="fas fa-info-circle fa-2x text-primary"></i>
+        <span class="padding-left text-primary">
           Songs will be found relative to the drive
           <br />Playlist can be moved inside the drive and songs will be found,
           but if drive changes, songs will not be found

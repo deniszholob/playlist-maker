@@ -5,7 +5,6 @@ import {
   FILE_FILTERS_MUSIC,
   FILE_FILTERS_PLAYLIST,
   MyFile,
-  slash,
 } from '@plm/util';
 import { dialog } from 'electron';
 import { PathLike } from 'fs';
@@ -53,7 +52,9 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
       defaultPath: 'New Playlist',
       filters: FILE_FILTERS_PLAYLIST,
     });
-    return data && data.filePath ? slash(data.filePath) : null;
+    // Using / instead of \ is not recognized... -_-
+    // return data && data.filePath ? slash(data.filePath) : null;
+    return data && data.filePath ? data.filePath : null;
   }
 
   public async getSongPath(oldPath: string) {
@@ -84,7 +85,9 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
         //   ? slash(newPath)
         //   : null;
       }
-      return slash(newPath);
+      // Using / instead of \ is not recognized... -_-
+      // return slash(newPath);
+      return newPath;
     }
     return null;
     // return data && data.filePath ? slash(data.filePath) : null;
