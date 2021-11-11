@@ -1,0 +1,20 @@
+{
+  "name": "Playlist Maker",
+  "short_name": "Playlist Maker",
+  "theme_color": "#32BBFF",
+  "background_color": "#2C2C2C",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./?utm_source=homescreen",
+  "dir": "ltr",
+  "lang": "en-US",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "assets/playlist-maker-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
