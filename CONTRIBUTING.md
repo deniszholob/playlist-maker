@@ -9,7 +9,7 @@
 See [package.json](./package.json) for all the `npm run ...` scripts or view/execute them in vscode explorer sidebar.
 
 1. Ensure NodeJS version 12.16.3 LTS or larger is installed on your system.
-2. Clone the repository.
+2. Clone the repository using git.
 3. Run `npm run i` in the folder that you've just cloned to ensure you have all dependencies that are needed for development.
 4. Install the `@recommended` extensions if using [VSCode editor](https://code.visualstudio.com/).
 5. Run `npm run start` to start the app on https://localhost:9200
@@ -47,13 +47,17 @@ This project has the following technologies
 * [NX dev tools](https://nx.dev/angular)
 * [Angular](https://angular.io/)
 * [Electron](https://www.electronjs.org/)
+* [Material CDK](https://material.angular.io/cdk/categories)
 * [music-metadata-browser](https://github.com/Borewit/music-metadata-browser)
 * [music-metadata](https://github.com/Borewit/music-metadata)
-* [Balloon Css](https://github.com/kazzkiq/balloon.css)
+* [Balloon Css Tooltips](https://github.com/kazzkiq/balloon.css)
+* [Paper Css Styles](https://www.getpapercss.com/)
+* [FontAwesome Icons](https://fontawesome.com/)
 
 Read more about them here
 * See the [NX Readme](./readme-nx.md)
 * See the [NX Electron Readme](https://github.com/bennymeg/nx-electron)
+
 
 ## Formatting/Code Styles
 [Prettier Formatter](https://prettier.io/) is set up along with the [VSCode Prettier Extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to enforce consistent code style/formatting along with [Husky](https://www.npmjs.com/package/husky) and [Lint Staged](https://www.npmjs.com/package/lint-staged) to auto format before commits are pushed.
@@ -61,5 +65,3 @@ Read more about them here
 * Formatting styles are defined in [prettierrc](.prettierrc) and [editorconfig](.editorconfig)
 * Husky will create git hooks on `npm install`
 * The [pre-commit](.husky/pre-commit) hook calls the npm `pre-commit` script in [package.json](package.json)
-
-

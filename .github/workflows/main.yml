@@ -55,7 +55,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install NPM Dependencies
         run: npm run i
@@ -64,9 +64,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules/.cache/nx
-          key: cache-nx-${{ hashFiles('package.json') }}-build-web-${{ github.sha }}
+          key: cache-nx-${{ hashFiles('package-lock.json') }}-build-web-${{ github.sha }}
           restore-keys: |
-            cache-nx-${{ hashFiles('package.json') }}-
+            cache-nx-${{ hashFiles('package-lock.json') }}-
 
       - name: Build
         run: npm run build:web
@@ -109,7 +109,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: '**/node_modules'
-          key: ${{runner.os}}-${{env.cache-name}}-${{hashFiles('**/package.json')}}
+          key: ${{runner.os}}-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
 
       - name: Install NPM Dependencies
         run: npm run i
@@ -220,19 +220,16 @@ jobs:
           name: Playlist Maker v${{env.RELEASE_VERSION}}
           tag: v${{env.RELEASE_VERSION}}
           body: |
-            [<img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/playlist-maker-download.png" width="200" />](https://github.com/deniszholob/playlist-maker/releases/download/v0.0.0/Playlist.Maker.0.0.0.zip)
+            [<img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/playlist-maker-download.png" width="200" />](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe)
             Double click to install and run.
 
-            ## One Click Install
-            * **Expand the _Assets_ below.**
-            * Download the setup installer `Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe`
-            * Double click to install and run.
-
             ## If you want a "portable"/non-installable node-version
-            * Download the `Playlist.Maker.${{env.RELEASE_VERSION}}.zip`
+            * Download the [Playlist.Maker.${{env.RELEASE_VERSION}}.zip](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.${{env.RELEASE_VERSION}}.zip)
             * Extract the contents into a new folder
             * Inside the folder double click on the .exe file in the new extracted  folder.
 
+            > Note: Chrome will say its a dangerous file
+            > Note: Windows will warn its from an unknown publisher
             > Note: Antivirus will probably alert and scan for a couple seconds, it does for me.
           artifacts: |
             release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,

@@ -1,4 +1,8 @@
 # Add files here to ignore them from prettier formatting
 
+# Ignore Artifacts
 /dist
 /coverage
+
+# Markdown Files
+*.md
