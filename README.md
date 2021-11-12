@@ -11,6 +11,7 @@ Creates Playlists from music files like `.mp3`
 * Run the installer.
 * Open the app.
 
+[<img src="screenshots/playlist-maker-download.png" width="100" />](https://github.com/deniszholob/playlist-maker/releases/latest)
 
 
 # [Support Me](https://www.patreon.com/deniszholob)
@@ -23,4 +24,3 @@ If you find the app or the source code useful, consider supporting me on [Patreo
 # Screenshots
 ![Playlist Maker Landing](screenshots/playlist-maker-lading.png)
 ![Playlist Maker Playlist](screenshots/playlist-maker-playlist.png)
-
