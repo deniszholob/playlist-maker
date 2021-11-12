@@ -27,7 +27,7 @@ ipcMain.handle(EVENT_CHANNELS.e_get_new_playlist_path, () =>
   handler.getNewPlaylistPath()
 );
 ipcMain.handle(EVENT_CHANNELS.e_get_song_path, (event, arg) =>
-  handler.getSongPath(arg)
+  handler.getMissingSongPath(arg)
 );
 ipcMain.handle(EVENT_CHANNELS.e_check_file_path, (event, arg) =>
   handler.doesFilePathExist(arg)

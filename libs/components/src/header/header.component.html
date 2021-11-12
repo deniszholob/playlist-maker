@@ -36,16 +36,23 @@
   <button
     (click)="save()"
     [attr.aria-label]="
-      areSongsValid
-        ? 'Save to ' + playlistPath
-        : 'Will save some songs with invalid locations'
+      haveSongs
+        ? areSongsValid
+          ? 'Save to ' + playlistPath
+          : 'Will save some songs with invalid locations'
+        : 'Nothing to save, load songs first'
     "
     data-balloon-pos="left"
     [ngClass]="
-      areSongsValid ? 'background-secondary' : 'background-warning-dark'
+      haveSongs
+        ? areSongsValid
+          ? 'background-secondary'
+          : 'background-warning-dark'
+        : ''
     "
+    [disabled]="!haveSongs"
   >
-    <i class="fas fa-exclamation" *ngIf="!areSongsValid"></i>
+    <i class="fas fa-exclamation" *ngIf="haveSongs && !areSongsValid"></i>
     Save
   </button>
   <!-- <button>Save New</button> -->

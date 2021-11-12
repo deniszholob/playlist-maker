@@ -8,6 +8,9 @@
 /tmp
 /out-tsc
 
+# Cache
+.eslintcache
+
 # dependencies
 /node_modules
 

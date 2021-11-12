@@ -13,7 +13,7 @@ export interface ElectronWindowApiRendererEvents {
   readFile: (path: string) => Promise<Buffer>;
   writeFile: (file: MyFile) => Promise<void>;
   getNewPlaylistPath: () => Promise<string | null>;
-  getSongPath: (oldPath: string) => Promise<string | null>;
+  getMissingSongPath: (oldPath: string) => Promise<string | null>;
   doesFilePathExist: (oldPath: PathLike) => Promise<boolean>;
 }
 

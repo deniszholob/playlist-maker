@@ -10,7 +10,7 @@ const exportApi: ElectronWindowApi = {
     ipcRenderer.invoke(EVENT_CHANNELS.e_write_file, file),
   getNewPlaylistPath: () =>
     ipcRenderer.invoke(EVENT_CHANNELS.e_get_new_playlist_path),
-  getSongPath: (oldPath: string) =>
+  getMissingSongPath: (oldPath: string) =>
     ipcRenderer.invoke(EVENT_CHANNELS.e_get_song_path, oldPath),
   doesFilePathExist: (path: PathLike) =>
     ipcRenderer.invoke(EVENT_CHANNELS.e_check_file_path, path),

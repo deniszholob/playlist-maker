@@ -1,9 +1,8 @@
 import {
   ElectronWindowApiRendererEvents,
-  FILE_ENCODING_M3U8,
-  FILE_ENCODING_M3U_ASCII,
   FILE_FILTERS_MUSIC,
   FILE_FILTERS_PLAYLIST,
+  getPlaylistEncoding,
   MyFile,
 } from '@plm/util';
 import { dialog } from 'electron';
@@ -29,9 +28,7 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
     if (!environment.production) {
       // console.log(`writeFile() - `, file);
     }
-    const encoding: BufferEncoding = file.path.toString().endsWith('.m3u8')
-      ? FILE_ENCODING_M3U8
-      : FILE_ENCODING_M3U_ASCII;
+    const encoding: BufferEncoding = getPlaylistEncoding(file.path.toString());
     const data = await writeFile(file.path, file.data, encoding);
     return data;
   }
@@ -57,7 +54,7 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
     return data && data.filePath ? data.filePath : null;
   }
 
-  public async getSongPath(oldPath: string) {
+  public async getMissingSongPath(oldPath: string) {
     if (!environment.production) {
       // console.log(`getSongPath() - Show save dialog`);
     }

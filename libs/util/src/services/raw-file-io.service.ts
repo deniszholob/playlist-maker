@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { from, fromEvent, Observable, of, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ERRORS } from '../data';
 import {
+  ERRORS,
   FILE_ENCODING_M3U8,
   FILE_ENCODING_M3U_WINDOWS,
-} from '../data/files.const';
+  htmlDownload,
+} from '../data';
 import { ElectronWindow, ElectronWindowApi, MyFile } from '../models';
 
 /** Do not use directly in components, user StateService instead */
@@ -30,7 +31,7 @@ export class RawFileIOService {
    * * Electron - file dialog opens for user to select file
    * * Web - default key is returned
    */
-  public getNewDataFilePath(): Observable<string | null> {
+  public getNewPlaylistFilePath(): Observable<string | null> {
     // console.log(`getDataFilePath()`);
     return this.electron
       ? from(this.electron.getNewPlaylistPath()).pipe(
@@ -40,13 +41,18 @@ export class RawFileIOService {
             return p;
           })
         )
-      : of('local');
+      : of(this.getNewPlaylistPathWeb());
   }
 
-  public getNewSongFilePath(oldPath: string) {
+  public getNewPlaylistPathWeb(): string | null {
+    const name = prompt('Enter playlist name', 'New Playlist');
+    return name ? `${name}.m3u8` : null;
+  }
+
+  public getMissingSongFilePath(oldPath: string) {
     return this.electron
-      ? from(this.electron.getSongPath(oldPath))
-      : of('local');
+      ? from(this.electron.getMissingSongPath(oldPath))
+      : of(prompt('Enter new song path'), oldPath);
   }
 
   public convertPath(
@@ -144,18 +150,27 @@ export class RawFileIOService {
    * @param location system path OR local storage key in web mode
    * @param fileContents data to save
    */
-  public writeFile(location: string, fileContents: string): Observable<null> {
+  public writeFile(location: string, fileContents: string): Observable<string> {
     // console.log(`writeFile() - `, location, fileContents);
     const myFile: MyFile = {
       path: location,
       data: fileContents,
     };
-    return this.electron ? this.writeFileElectron(myFile) : of(null);
+    return (
+      this.electron ? this.writeFileElectron(myFile) : this.writeFileWeb(myFile)
+    ).pipe(
+      map(() => `${this.electron ? 'Saved to' : 'Downloaded'} ${myFile.path}`)
+    );
   }
 
-  private writeFileElectron(myFile: MyFile): Observable<null> {
+  private writeFileElectron(myFile: MyFile): Observable<void> {
     // console.log(`  writeFileElectron() - `, myFile);
     if (!this.electron) return throwError('Electron is not available!');
-    return from(this.electron.writeFile(myFile)).pipe(map(() => null));
+    return from(this.electron.writeFile(myFile));
+  }
+
+  private writeFileWeb(myFile: MyFile): Observable<void> {
+    const fileName = myFile.path.toString();
+    return of(htmlDownload(fileName, myFile.data));
   }
 }

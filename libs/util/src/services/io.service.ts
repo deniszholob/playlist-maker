@@ -19,7 +19,7 @@ export class IoService {
   ) {}
 
   public createNewPlaylist() {
-    return this.rawFileIOService.getNewDataFilePath().pipe(
+    return this.rawFileIOService.getNewPlaylistFilePath().pipe(
       // Ignore null, means user closed window
       filter((p) => p != null),
       tap((path) => {
@@ -184,7 +184,7 @@ export class IoService {
 
   /** @param oldPath "C:/Users/Bob/Music/Album/Song.mp3" */
   public fixPathsBasedOn(oldPath: string) {
-    return this.rawFileIOService.getNewSongFilePath(oldPath).pipe(
+    return this.rawFileIOService.getMissingSongFilePath(oldPath).pipe(
       map((path: string) => {
         if (!path) return null; // User cancelled the save dialog
 

@@ -27,6 +27,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public relativePaths: boolean;
   public filesAccepted = FILE_ACCEPT_MUSIC;
   public playlistPath = '';
+  public haveSongs = false;
   public areSongsValid = false;
   public areSongsLoading = false;
 
@@ -54,12 +55,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.clearSubscriptions))
       .subscribe((store: Playlist) => {
         this.playlistPath = store.path;
-        this.areSongsValid =
-          store.songData && store.songData.length > 0
-            ? store.songData
-                .map((song) => song.validPath)
-                .reduce((prev, curr) => prev && curr)
-            : false;
+        this.haveSongs = store.songData && store.songData.length > 0;
+        this.areSongsValid = this.haveSongs
+          ? store.songData
+              .map((song) => song.validPath)
+              .reduce((prev, curr) => prev && curr)
+          : false;
       });
   }
 
@@ -104,7 +105,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public save() {
     this.ioService.exportPlaylist(this.relativePaths).subscribe(
       (res) => {
-        alert('Playlist Saved');
+        alert(res);
       },
       (err) => {
         alert('Error Saving Playlist');
