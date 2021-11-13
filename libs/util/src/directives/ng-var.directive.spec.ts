@@ -3,9 +3,9 @@
 import { TestBed, async } from '@angular/core/testing';
 import { NgVarDirective } from './ng-var.directive';
 
-describe('Directive: NgVar', () => {
+describe('NgVarDirective', () => {
   it('should create an instance', () => {
-    const directive = new NgVarDirective();
+    const directive = new NgVarDirective(null, null);
     expect(directive).toBeTruthy();
   });
 });

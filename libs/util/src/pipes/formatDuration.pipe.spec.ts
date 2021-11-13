@@ -2,7 +2,7 @@
 
 import { FormatDurationPipe } from './formatDuration.pipe';
 
-describe('Pipe: FormatDuratione', () => {
+describe('FormatDurationPipe', () => {
   it('create an instance', () => {
     const pipe = new FormatDurationPipe();
     expect(pipe).toBeTruthy();

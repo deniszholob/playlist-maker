@@ -1,16 +1,19 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, inject } from '@angular/core/testing';
-import { RawFileIoService } from './raw-file-io.service';
+import { TestBed } from '@angular/core/testing';
+import { RawFileIOService } from './raw-file-io.service';
 
-describe('Service: RawFileIo', () => {
+describe('RawFileIOService', () => {
+  let service: RawFileIOService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RawFileIoService]
+      providers: [RawFileIOService],
     });
+    service = TestBed.inject(RawFileIOService);
   });
 
-  it('should ...', inject([RawFileIoService], (service: RawFileIoService) => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
-  }));
+  });
 });

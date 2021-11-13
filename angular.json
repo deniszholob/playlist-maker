@@ -141,7 +141,6 @@
                 "input": "global/assets",
                 "output": "./assets"
               },
-              "apps/web/src/assets",
               "apps/web/src/manifest.webmanifest"
             ],
             "styles": ["global/styles/styles.scss"],
