@@ -1,5 +1,7 @@
 {
   "files.exclude": {
+    "**/.github": true,
+    "**/.husky": true,
     "**/apps/web-e2e": true,
     "**/apps/**/.browserslistrc": true,
     "**/apps/**/assets": true,
@@ -36,9 +38,7 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.renderWhitespace": "all",
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "workbench.iconTheme": "material-icon-theme",
   "material-icon-theme.activeIconPack": "angular_ngrx",
   "material-icon-theme.folders.associations": {
@@ -53,7 +53,7 @@
     "wrappers": "hook",
     "document": "",
     "workflows": "github",
-    "formly": "scala",
+    "formly": "scala"
   },
   "material-icon-theme.files.associations": {
     "*.interceptor.ts": "apollo",
@@ -66,7 +66,7 @@
     "index.ts": "url",
     "public-api.ts": "url",
     "models.ts": "url",
-    "services.ts": "url",
+    "services.ts": "url"
   },
   "cSpell.words": [
     "contenteditable",
@@ -89,5 +89,5 @@
   "svg.preview.background": "transparent",
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
+  }
 }
