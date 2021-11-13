@@ -15,3 +15,5 @@
 * [Env Filed](https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files)
 * [current npm package version](https://gist.github.com/DarrenN/8c6a5b969481725a4413#gistcomment-3364676)
 * [Supported OS](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
+* [caching npm](https://www.voorhoede.nl/en/blog/super-fast-npm-install-on-github-actions/)
+* [caching npm example](https://github.com/actions/cache/blob/main/examples.md#node---npm)

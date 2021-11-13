@@ -47,7 +47,8 @@
     "update": "nx migrate latest",
     "ng": "nx",
     "nx": "nx",
-    "pre-commit": "npm version patch --no-git-tag-version && git add package.json && npx lint-staged",
+    "version-bump": "npm version patch --no-git-tag-version",
+    "pre-commit": "npm version patch --no-git-tag-version && git add package.json package-lock.json && npx lint-staged",
     "prepare": "husky install",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main && exitzero electron-builder install-app-deps"
   },

@@ -49,24 +49,31 @@ jobs:
         with:
           node-version: '14.17.0'
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
       - name: Cache node modules
+        id: npm-cache
         uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{steps.npm-cache-dir.outputs.dir}}
+          key: ${{runner.os}}-node-${{hashFiles('**/package-lock.json')}}
+          restore-keys: |
+            ${{runner.os}}-node-
 
       - name: Install NPM Dependencies
-        run: npm run i
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Cache Nx
         uses: actions/cache@v2
         with:
           path: node_modules/.cache/nx
-          key: cache-nx-${{ hashFiles('package-lock.json') }}-build-web-${{ github.sha }}
+          key: cache-nx-${{hashFiles('package-lock.json')}}-build-web-${{github.sha}}
           restore-keys: |
-            cache-nx-${{ hashFiles('package-lock.json') }}-
+            cache-nx-${{hashFiles('package-lock.json')}}-
+            cache-nx-
 
       - name: Build
         run: npm run build:web
@@ -103,16 +110,22 @@ jobs:
         run: |
           echo "RELEASE_VERSION=`cat RELEASE_VERSION.txt`" >> $GITHUB_ENV
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
       - name: Cache node modules
+        id: npm-cache
         uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
-          path: '**/node_modules'
-          key: ${{runner.os}}-${{env.cache-name}}-${{hashFiles('**/package-lock.json')}}
+          path: ${{steps.npm-cache-dir.outputs.dir}}
+          key: ${{runner.os}}-node-${{hashFiles('**/package-lock.json')}}
+          restore-keys: |
+            ${{runner.os}}-node-
 
       - name: Install NPM Dependencies
-        run: npm run i
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Download build
         uses: actions/download-artifact@v2
@@ -183,7 +196,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get-release-version, build-windows]
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}} # This token is provided by Actions, you do not need to create your own token
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -223,14 +236,15 @@ jobs:
             [<img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/playlist-maker-download.png" width="200" />](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe)
             Double click to install and run.
 
-            ## If you want a "portable"/non-installable node-version
+            ### If you want a "portable"/non-installable node-version
             * Download the [Playlist.Maker.${{env.RELEASE_VERSION}}.zip](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.${{env.RELEASE_VERSION}}.zip)
             * Extract the contents into a new folder
             * Inside the folder double click on the .exe file in the new extracted  folder.
 
-            > Note: Chrome will say its a dangerous file
-            > Note: Windows will warn its from an unknown publisher
-            > Note: Antivirus will probably alert and scan for a couple seconds, it does for me.
+            ### Notes
+            > * Chrome will say its a dangerous file.
+            > * Windows will warn its from an unknown publisher.
+            > * Antivirus will probably alert and scan for a couple seconds.
           artifacts: |
             release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,
             release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip
