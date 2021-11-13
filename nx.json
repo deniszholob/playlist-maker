@@ -34,6 +34,9 @@
       "tags": ["scope:electron"],
       "implicitDependencies": ["web"]
     },
+    "pages": {
+      "tags": ["scope:web", "type:feature"]
+    },
     "util": {
       "tags": ["scope:web", "scope:electron", "type:util"]
     },

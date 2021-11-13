@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@plm/components": ["libs/components/src/index.ts"],
+      "@plm/pages": ["libs/pages/src/index.ts"],
       "@plm/util": ["libs/util/src/index.ts"]
     },
     "strict": true,

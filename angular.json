@@ -94,6 +94,31 @@
         }
       }
     },
+    "pages": {
+      "projectType": "library",
+      "root": "libs/pages",
+      "sourceRoot": "libs/pages/src",
+      "prefix": "plm",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/pages"],
+          "options": {
+            "jestConfig": "libs/pages/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/pages/src/**/*.ts",
+              "libs/pages/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
     "util": {
       "projectType": "library",
       "root": "libs/util",
