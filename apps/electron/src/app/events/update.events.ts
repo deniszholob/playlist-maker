@@ -31,6 +31,7 @@ export default class UpdateEvents {
 
 autoUpdater.on(
   'update-downloaded',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (event, releaseNotes, releaseName, releaseDate) => {
     const dialogOpts = {
       type: 'info',

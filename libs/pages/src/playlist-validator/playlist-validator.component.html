@@ -1,0 +1,181 @@
+<div class="flex col padding-small container">
+  <!-- Step 1 -->
+  <plm-step
+    [number]="1"
+    [title]="'Check Playlist validity'"
+    [currentStep]="currentStep"
+    (openStep)="openStep($event)"
+  >
+    <p>
+      Playlist songs paths may become stale if either the playlist file or the
+      songs in the playlist have been moved.
+      <br />
+      Open the Playlist folder to check the playlist files
+      <br />
+    </p>
+    <button
+      class="background-secondary margin-small"
+      (click)="openPlaylist($event)"
+    >
+      Open Playlist in Playlist folder
+    </button>
+    <div
+      *ngIf="this.openedDir && !invalidPlaylistSong"
+      class="alert alert-success"
+    >
+      <i class="fas fa-check fa-xs text-primary"></i>
+      <span class="text-primary">
+        <em>{{ this.openedDir }}</em> has all valid playlists!
+      </span>
+    </div>
+  </plm-step>
+
+  <!-- Step 2 -->
+  <plm-step
+    [number]="2"
+    [title]="'Teach the computer how to fix playlists'"
+    [currentStep]="currentStep"
+    (openStep)="openStep($event)"
+  >
+    <p>
+      Now we can tell the computer where to look for songs until all the songs
+      and playlists are fixed.
+      <br />
+      Computers are not that smart so we may need to teach it using multiple
+      songs.
+    </p>
+
+    <div class="d-flex flex-justify-between">
+      <!-- Stats -->
+      <div class="margin-bottom-small">
+        <!-- Playlists -->
+        <div>
+          <span
+            [ngClass]="
+              totalValidPlaylists < totalPlaylists
+                ? 'text-danger'
+                : 'text-success'
+            "
+            >{{ totalValidPlaylists }}</span
+          >
+          /
+          <span class="text-secondary">{{ totalPlaylists }}</span>
+          valid playlists
+        </div>
+        <!-- Songs -->
+        <div>
+          <span
+            [ngClass]="
+              totalValidPlaylists < totalPlaylists
+                ? 'text-danger'
+                : 'text-success'
+            "
+            >{{ totalValidSongs }}</span
+          >
+          /
+          <span class="text-secondary">{{ totalSongs }}</span>
+          valid songs
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="form-group d-flex flex-col">
+        <div>
+          <label class="paper-switch-2">
+            <input
+              id="paperSwitch11"
+              name="showOneAtATime"
+              type="checkbox"
+              [checked]="showOneAtATime"
+              (change)="showOneAtATime = !showOneAtATime"
+            />
+            <span class="paper-switch-slider round"></span>
+          </label>
+          <label for="showOneAtATime" class="paper-switch-2-label">
+            Show One Fix At a Time
+          </label>
+        </div>
+
+        <div *ngIf="!showOneAtATime">
+          <label class="paper-switch-2">
+            <input
+              name="showInvalidOnly"
+              type="checkbox"
+              [checked]="showInvalidOnly"
+              (change)="showInvalidOnly = !showInvalidOnly"
+            />
+            <span class="paper-switch-slider round"></span>
+          </label>
+          <label for="showInvalidOnly" class="paper-switch-2-label">
+            Show Only Missing Songs
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <ng-container *ngIf="showOneAtATime">
+      <div *ngIf="!invalidPlaylistSong" class="alert alert-success">
+        <i class="fas fa-check fa-xs text-primary"></i>
+        <span class="text-primary"> All Songs Valid! </span>
+      </div>
+      <plm-pv-song
+        *ngIf="invalidPlaylistSong"
+        [song]="invalidPlaylistSong"
+        (fixSongPath)="fixSongPath($event)"
+      >
+      </plm-pv-song>
+    </ng-container>
+
+    <ng-container *ngIf="!showOneAtATime">
+      <div *ngIf="!invalidPlaylistSong" class="alert alert-success">
+        <i class="fas fa-check fa-xs text-primary"></i>
+        <span class="text-primary"> All Playlists Valid! </span>
+      </div>
+
+      <div *ngFor="let pl of playlists">
+        <plm-pv-playlist
+          *ngIf="showObject(pl.validSongs === pl.totalSongs)"
+          [pl]="pl"
+          [showInvalidOnly]="showInvalidOnly"
+          (fixSongPath)="fixSongPath($event)"
+        >
+        </plm-pv-playlist>
+      </div>
+    </ng-container>
+  </plm-step>
+
+  <!-- Step 3 -->
+  <plm-step
+    [number]="3"
+    [title]="'Save!'"
+    [currentStep]="currentStep"
+    (openStep)="openStep($event)"
+  >
+    <div class="alert alert-success">
+      <i class="fas fa-check fa-xs text-primary"></i>
+      <span class="text-primary">
+        <em>{{ this.openedDir }}</em> has all valid playlists!
+      </span>
+    </div>
+    <button
+      (click)="saveAll()"
+      [attr.aria-label]="
+        !invalidPlaylistSong
+          ? 'Save All Loaded Playlists'
+          : 'There are still invalid locations, please fix them'
+      "
+      data-balloon-pos="right"
+      [ngClass]="
+        !invalidPlaylistSong
+          ? 'background-secondary'
+          : 'background-warning-dark'
+      "
+      [disabled]="invalidPlaylistSong"
+    >
+      <i class="fas fa-exclamation" *ngIf="invalidPlaylistSong"></i>
+      Save All
+    </button>
+  </plm-step>
+</div>

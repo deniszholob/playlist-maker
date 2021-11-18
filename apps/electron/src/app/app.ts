@@ -1,4 +1,9 @@
-import { BrowserWindow, Menu, screen, shell } from 'electron';
+import {
+  BrowserWindow,
+  //  Menu,
+  screen,
+  shell,
+} from 'electron';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -38,10 +43,13 @@ export default class App {
     App.mainWindow = null;
   }
 
-  private static onRedirect(event: any, url: string) {
+  private static onRedirect(url: string, event?: Event) {
+    if (!App.mainWindow) {
+      throw new Error('Electron window is null!');
+    }
     if (url !== App.mainWindow.webContents.getURL()) {
       // this is a normal external redirect, open it in a new browser window
-      event.preventDefault();
+      event ? event.preventDefault() : null;
       shell.openExternal(url);
     }
   }
@@ -64,6 +72,9 @@ export default class App {
 
   private static initMenu() {
     if (!App.isDevelopmentMode()) {
+      if (!App.mainWindow) {
+        throw new Error('Electron window is null!');
+      }
       App.mainWindow.setMenu(null);
     }
     // App.mainWindow.setMenu(null);
@@ -110,10 +121,16 @@ export default class App {
     });
 
     // handle all external redirects in a new browser window
-    // App.mainWindow.webContents.on('will-navigate', App.onRedirect);
+    App.mainWindow.webContents.on('will-navigate', (event, url) =>
+      App.onRedirect(url, event)
+    );
     // App.mainWindow.webContents.on('new-window', (event, url, frameName, disposition, options) => {
-    //     App.onRedirect(event, url);
+    //   App.onRedirect(url, event);
     // });
+    App.mainWindow.webContents.setWindowOpenHandler((details) => {
+      App.onRedirect(details.url);
+      return { action: 'deny' };
+    });
 
     // Emitted when the window is closed.
     App.mainWindow.on('closed', () => {
@@ -142,6 +159,7 @@ export default class App {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
     // we pass the Electron.App object and the
     // Electron.BrowserWindow into this function

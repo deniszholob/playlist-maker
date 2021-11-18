@@ -9,6 +9,7 @@ import {
   AppStore,
   AppStoreService,
   FILE_ACCEPT_MUSIC,
+  getFilesSelected,
   IoService,
   Playlist,
   PlaylistStoreService,
@@ -24,7 +25,6 @@ import { takeUntil } from 'rxjs/operators';
 export class HeaderComponent implements OnInit, OnDestroy {
   public renderRelativeSelection = true;
   public appSettings$: Observable<AppStore> = this.appStoreService.getStore();
-  public relativePaths: boolean;
   public filesAccepted = FILE_ACCEPT_MUSIC;
   public playlistPath = '';
   public haveSongs = false;
@@ -44,23 +44,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.appSettings$
-      .pipe(takeUntil(this.clearSubscriptions))
-      .subscribe((settings: AppStore) => {
-        this.relativePaths = settings.relativePaths;
-      });
-
     this.playlistStoreService
       .getStore()
       .pipe(takeUntil(this.clearSubscriptions))
       .subscribe((store: Playlist) => {
-        this.playlistPath = store.path;
-        this.haveSongs = store.songData && store.songData.length > 0;
-        this.areSongsValid = this.haveSongs
-          ? store.songData
-              .map((song) => song.validPath)
-              .reduce((prev, curr) => prev && curr)
-          : false;
+        this.playlistPath = store.path ?? '';
+        this.haveSongs = store.totalSongs > 0;
+        this.areSongsValid = store.validSongs === store.totalSongs;
       });
   }
 
@@ -75,42 +65,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   public updatePaths(relativePaths: boolean) {
-    this.appStoreService.setState({
-      ...this.appStoreService.getState(),
-      relativePaths,
-    });
+    this.appStoreService.setSettings({ relativePaths });
   }
 
   /** @see https://stackoverflow.com/questions/58351711/angular-open-file-dialog-upon-button-click */
   public openFiles(event: Event): void {
     // console.log(`openFiles`, event);
-
-    if (event.target instanceof HTMLInputElement) {
-      const fileList: FileList = event.target.files;
-      const files: File[] = Array.from(fileList);
-
-      this.areSongsLoading = true;
-      this.ioService.readAudioFilesData(files).subscribe(
-        () => (this.areSongsLoading = false),
-        () => (this.areSongsLoading = false)
-      );
-      return;
-    }
-
-    throw new Error(
-      `Invalid ${typeof event} event, should be HTMLInputElement`
+    const files: File[] = getFilesSelected(event);
+    this.areSongsLoading = true;
+    this.ioService.readAudioFilesData(files).subscribe(
+      () => (this.areSongsLoading = false),
+      () => (this.areSongsLoading = false)
     );
   }
 
   public save() {
-    this.ioService.exportPlaylist(this.relativePaths).subscribe(
-      (res) => {
-        alert(res);
-      },
-      (err) => {
-        alert('Error Saving Playlist');
-        console.error(err);
-      }
-    );
+    const playlist = this.playlistStoreService.getSnapshot();
+    this.ioService
+      .exportPlaylist(
+        playlist,
+        this.appStoreService.getSnapshot().settings.relativePaths
+      )
+      .subscribe(
+        (res) => {
+          alert(res);
+        },
+        (err) => {
+          alert('Error Saving Playlist');
+          console.error(err);
+        }
+      );
   }
 }

@@ -1,0 +1,11 @@
+<i class="fas fa-check song-check text-green" *ngIf="song.validPath"></i>
+<button
+  *ngIf="!song.validPath"
+  [attr.aria-label]="'Find Missing Song'"
+  data-balloon-pos="up-left"
+  class="text-orange btn-small song-check"
+  (click)="onFixSongPath(song)"
+>
+  <i class="fas fa-exclamation"></i>
+</button>
+<span class="padding-small">{{ song.path }}</span>

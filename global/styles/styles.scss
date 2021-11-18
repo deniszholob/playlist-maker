@@ -8,6 +8,11 @@ html.dark body {
   --balloon-font-size: 1rem;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 h1 {
   font-size: 1rem;
   // border-bottom: 1px dashed #d9d9d8;
@@ -15,6 +20,12 @@ h1 {
   margin-top: 0;
   padding: 0.5rem 0;
   overflow-wrap: break-word;
+}
+a {
+  background-image: none;
+  &:visited {
+    color: var(--secondary);
+  }
 }
 
 .alert.row {
@@ -77,4 +88,46 @@ table {
 .cdk-drag-placeholder {
   background-color: var(--shadow-color-hover);
   border: none;
+}
+
+header {
+  border-bottom: 4px solid transparent;
+  &.web {
+    border-color: #e34c26;
+  }
+  &.electron {
+    border-color: #9feaf9;
+  }
+  button {
+    margin: 0;
+    border-color: transparent;
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  h1 {
+    cursor: pointer;
+  }
+  h4 {
+    button {
+      padding: 0.25rem;
+    }
+  }
+}
+
+.settings {
+  background: rgba(10, 10, 10, 0.5);
+  width: 100%;
+  z-index: 2;
+  &.flex-scroll {
+    flex: 1 50%;
+  }
+}
+
+.flex-scroll {
+  flex: 1 auto;
+  overflow: auto;
+  display: flex;
 }
