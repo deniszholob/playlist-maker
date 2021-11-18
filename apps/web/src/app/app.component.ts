@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FILE_ACCEPT_PLAYLIST,
-  IoService,
-  PlaylistStoreService,
-} from '@plm/util';
+import { AppStoreService, Page, PlaylistStoreService } from '@plm/util';
 
 @Component({
   selector: 'plm-maker-root',
@@ -11,37 +7,36 @@ import {
   // styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  public appTitle = 'Playlist Maker';
-  public FILE_ACCEPT_PLAYLIST = FILE_ACCEPT_PLAYLIST;
-  public playlistOpen = false;
-  public songs$ = this.playlistStoreService.getStoreSongs();
+  public Page = Page;
+  public app = this.appStoreService.getSnapshot();
+  public settingsOpen = false;
 
   constructor(
-    private playlistStoreService: PlaylistStoreService,
-    private ioService: IoService
+    private appStoreService: AppStoreService,
+    private playlistStoreService: PlaylistStoreService
   ) {}
 
   ngOnInit(): void {
-    this.playlistStoreService.getStore().subscribe((playlist) => {
-      // console.log(`Playlist Store Update`, playlist);
-      if (playlist && playlist.path) {
-        this.playlistOpen = true;
-      } else {
-        this.playlistOpen = false;
-      }
+    console.log();
+    // this.playlistService.getStore();
+    this.appStoreService.getStore().subscribe((appStore) => {
+      this.app = appStore;
     });
   }
 
-  public newPlaylist() {
-    this.ioService.createNewPlaylist().subscribe();
-  }
-
-  public openPlaylist(openedFiles: File[]) {
-    const playlistFile = openedFiles[0];
-    this.ioService.readPlaylistData(playlistFile).subscribe();
-  }
-
-  public onClosePlaylist() {
+  public goHome() {
+    if (this.app.unsavedChanges) {
+      const userAction = confirm(
+        `You have unsaved changes!\nClicking "Ok" will discard them!\nAre you sure you want to navigate away?`
+      );
+      if (!userAction) return;
+    }
+    this.appStoreService.setPage(Page.landing);
     this.playlistStoreService.reset();
+  }
+
+  public toggleSettings() {
+    // console.log(`toggleSettings`);
+    this.settingsOpen = !this.settingsOpen;
   }
 }

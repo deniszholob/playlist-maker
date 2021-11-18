@@ -62,13 +62,13 @@ function getCsvAcceptedExtensions(filter: FileFilter[]): string {
           .map((s) => `.${s}`)
           // Combine extensions array with comma delimited values
           .reduce((prev, curr) => {
-            return `${prev}, ${curr}`;
+            return `${prev},${curr}`;
           })
       );
     })
     .reduce((prev, curr) => {
       // Combine root array with comma delimited values
-      return `${prev}, ${curr}`;
+      return `${prev},${curr}`;
     });
 }
 

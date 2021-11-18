@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { from, fromEvent, Observable, of, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
-
+import { map, switchMap } from 'rxjs/operators';
 import {
+  ElectronWindow,
+  ElectronWindowApi,
   ERRORS,
   FILE_ENCODING_M3U8,
   FILE_ENCODING_M3U_WINDOWS,
   htmlDownload,
+  MyFile,
 } from '../data';
-import { ElectronWindow, ElectronWindowApi, MyFile } from '../models';
+import { PlaylistDir } from '../data/electron-bridge';
 
 /** Do not use directly in components, user StateService instead */
 @Injectable({ providedIn: 'root' })
@@ -27,34 +29,44 @@ export class RawFileIOService {
   // ======================================================================== //
   // ============================= Filepaths ================================ //
 
-  /** Returns filepath to use
+  // ------------------------------------------------------------------------ //
+  /**
    * * Electron - file dialog opens for user to select file
-   * * Web - default key is returned
+   * * Web - web prompts user for filename
+   * @returns file path of a playlist
    */
   public getNewPlaylistFilePath(): Observable<string | null> {
     // console.log(`getDataFilePath()`);
     return this.electron
-      ? from(this.electron.getNewPlaylistPath()).pipe(
-          map((p) => {
-            // FIXME: Where/When to throw error?
-            // if (!p) throw new Error(`"${p}" ${ERRORS.INVALID_PATH}`);
-            return p;
-          })
-        )
-      : of(this.getNewPlaylistPathWeb());
+      ? from(this.electron.getNewPlaylistPath())
+      : this.getNewPlaylistPathWeb();
   }
 
-  public getNewPlaylistPathWeb(): string | null {
+  private getNewPlaylistPathElectron(): Observable<string | null> {
+    if (!this.electron) return throwError('Electron is not available!');
+    return from(this.electron.getNewPlaylistPath()).pipe(
+      map((p) => {
+        // FIXME: Where/When to throw error?
+        // if (!p) throw new Error(`"${p}" ${ERRORS.INVALID_PATH}`);
+        return p;
+      })
+    );
+  }
+
+  private getNewPlaylistPathWeb(): Observable<string | null> {
     const name = prompt('Enter playlist name', 'New Playlist');
-    return name ? `${name}.m3u8` : null;
+    return of(name ? `${name}.m3u8` : null);
   }
 
-  public getMissingSongFilePath(oldPath: string) {
+  // ------------------------------------------------------------------------ //
+  /** @returns new file path of a file */
+  public getMissingSongFilePath(oldPath: string): Observable<string | null> {
     return this.electron
       ? from(this.electron.getMissingSongPath(oldPath))
       : of(prompt('Enter new song path'), oldPath);
   }
 
+  // ------------------------------------------------------------------------ //
   public convertPath(
     path: string,
     basedOnRelativePath: string,
@@ -66,17 +78,27 @@ export class RawFileIOService {
       : path;
   }
 
+  // ------------------------------------------------------------------------ //
   public validateFilePath(path: string): Observable<boolean> {
     return this.electron
       ? from(this.electron.doesFilePathExist(path))
       : of(true);
   }
 
+  // ------------------------------------------------------------------------ //
+  public openPlaylistFolder(
+    defaultPath?: string
+  ): Observable<PlaylistDir | null> {
+    return this.electron
+      ? from(this.electron.openPlaylistFolder(defaultPath))
+      : of(null);
+  }
+
   // ======================================================================== //
   // ============================= Reads ==================================== //
 
   /** Gets file data from:
-   * * FileReader - Html open file dialog (saves to local storage if not electron app)
+   * * FileReader - Html open file dialog
    * * Electron - file load
    * @param location system path OR local storage key in web mode
    * @param file file from file dialog
@@ -86,26 +108,30 @@ export class RawFileIOService {
       location: string;
       file?: File;
       isMediaFile?: boolean;
-    } = { location: null, isMediaFile: false }
+    } = { location: '', isMediaFile: false }
   ): Observable<string> {
     // console.log(`readFile() - `, args);
     return args.file
       ? this.readFileWeb(args.file, args.isMediaFile)
-      : this.electron
-      ? this.readFileElectron(args.location)
-      : of(null);
+      : this.electron && location
+      ? this.readFileElectron(args.location, args.isMediaFile)
+      : of('');
   }
 
-  private readFileElectron(path: string): Observable<string> {
+  private readFileElectron(
+    path: string,
+    isMediaFile = false
+  ): Observable<string> {
     // console.log(`  readFileElectron() - `, path);
     if (!this.electron) return throwError('Electron is not available!');
     return from(this.electron.readFile(path)).pipe(
       // TODO: types
-      map<Buffer, string>((v) => {
-        if (!v) {
+      switchMap((buffer) => {
+        if (!buffer) {
           throw new Error(`${ERRORS.ANGULAR_NO_DATA} for "${path}"`);
         }
-        return 'TODO: read buffer';
+        const blob = new File([buffer], path);
+        return this.readFileWeb(blob, isMediaFile);
       })
     );
   }
@@ -126,7 +152,7 @@ export class RawFileIOService {
       }
     }
 
-    reader.onerror = (e) => {
+    reader.onerror = () => {
       throw new Error(`Error occurred reading file: ${f.name}`);
     };
 

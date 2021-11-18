@@ -1,0 +1,45 @@
+<h4 class="full-width margin-bottom-small margin-top">
+  <button
+    class="
+      btn-small
+      text-secondary
+      border-secondary
+      margin-right-small
+      padding-none
+    "
+    (click)="collapsed = !collapsed"
+  >
+    <i class="fas fa-plus fa-sm" *ngIf="collapsed"></i>
+    <i class="fas fa-minus fa-sm" *ngIf="!collapsed"></i>
+  </button>
+  <small
+    [ngClass]="
+      pl.validSongs === pl.totalSongs
+        ? 'text-green'
+        : pl.validSongs === 0
+        ? 'text-red'
+        : 'text-orange'
+    "
+  >
+    <i class="fas fa-check fa-sm" *ngIf="pl.validSongs === pl.totalSongs"></i>
+    <i
+      class="fas fa-exclamation fa-sm"
+      *ngIf="pl.validSongs !== pl.totalSongs"
+    ></i>
+    <span class="margin-left-small"
+      >{{ pl.validSongs }}/{{ pl.totalSongs }}</span
+    >
+  </small>
+  <span class="margin-left text-muted">{{ pl.path }}</span>
+</h4>
+
+<div class="margin-left" *ngIf="!collapsed">
+  <div *ngFor="let song of pl.songData" class="full-width">
+    <plm-pv-song
+      *ngIf="showObject(song.validPath)"
+      [song]="song"
+      (fixSongPath)="onFixSongPath($event)"
+    >
+    </plm-pv-song>
+  </div>
+</div>

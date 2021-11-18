@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as _buffer from 'buffer';
 import * as process from 'process';
 

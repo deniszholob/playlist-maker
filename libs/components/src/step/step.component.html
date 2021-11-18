@@ -1,0 +1,16 @@
+<div
+  id="Step-{{ number }}"
+  (click)="onOpenStep(number)"
+  class="step padding-bottom-small"
+>
+  <h1 class="background-dark padding-small">
+    <i
+      class="fas fa-shoe-prints fa-xs text-secondary"
+      *ngIf="number >= currentStep"
+    ></i>
+    <i class="fas fa-check fa-xs text-success" *ngIf="number < currentStep"></i>
+    <span class="text-muted"> Step {{ number }}: </span>
+    <small>{{ title }}</small>
+  </h1>
+  <ng-content *ngIf="number === currentStep"></ng-content>
+</div>

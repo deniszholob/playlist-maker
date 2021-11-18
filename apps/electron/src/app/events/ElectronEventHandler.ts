@@ -1,15 +1,17 @@
 import {
   ElectronWindowApiRendererEvents,
+  FILE_ACCEPT_PLAYLIST,
   FILE_FILTERS_MUSIC,
   FILE_FILTERS_PLAYLIST,
   getPlaylistEncoding,
   MyFile,
+  PlaylistDir,
+  slash,
 } from '@plm/util';
 import { dialog } from 'electron';
-import { PathLike } from 'fs';
-import { readFile, stat, writeFile } from 'fs/promises';
-import { parse } from 'path';
-
+// import { PathLike } from 'fs';
+import { readdir, readFile, stat, writeFile } from 'fs/promises';
+import { parse, resolve } from 'path';
 import { environment } from '../../environments/environment';
 
 /**
@@ -33,10 +35,38 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
     return data;
   }
 
-  public doesFilePathExist(path: PathLike): Promise<boolean> {
+  public doesFilePathExist(path: string): Promise<boolean> {
     return stat(path)
       .then((stats) => stats.isFile())
-      .catch((err) => false);
+      .catch(() => false);
+  }
+
+  public async openPlaylistFolder(
+    defaultPath?: string
+  ): Promise<PlaylistDir | null> {
+    const data = await dialog.showOpenDialog({
+      title: 'Select Playlist Folder',
+      buttonLabel: 'Select Folder',
+      defaultPath,
+      properties: ['openDirectory'],
+    });
+    if (data && data.filePaths && data.filePaths[0]) {
+      const playlistPath = data.filePaths[0];
+      const dirObjects = await readdir(playlistPath, { withFileTypes: true });
+      const files = await dirObjects
+        // Filter out folders
+        .filter((obj) => obj.isFile())
+        // Filter out unsupported file extensions
+        .filter((obj) =>
+          FILE_ACCEPT_PLAYLIST.split(',')
+            .map((ext) => obj.name.endsWith(ext))
+            .reduce((prev, curr) => prev || curr)
+        )
+        // Get file path
+        .map((file) => slash(resolve(playlistPath, file.name)));
+      return { dir: playlistPath, files };
+    }
+    return null;
   }
 
   public async getNewPlaylistPath(): Promise<string | null> {
@@ -44,14 +74,14 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
       // console.log(`getSaveFilePath() - Show save dialog`);
     }
     const data = await dialog.showSaveDialog({
-      title: 'New PLaylist',
+      title: 'New Playlist',
       buttonLabel: 'Create Playlist',
       defaultPath: 'New Playlist',
       filters: FILE_FILTERS_PLAYLIST,
     });
     // Using / instead of \ is not recognized... -_-
-    // return data && data.filePath ? slash(data.filePath) : null;
-    return data && data.filePath ? data.filePath : null;
+    return data && data.filePath ? slash(data.filePath) : null;
+    // return data && data.filePath ? data.filePath : null;
   }
 
   public async getMissingSongPath(oldPath: string) {
@@ -83,8 +113,8 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
         //   : null;
       }
       // Using / instead of \ is not recognized... -_-
-      // return slash(newPath);
-      return newPath;
+      return slash(newPath);
+      // return newPath;
     }
     return null;
     // return data && data.filePath ? slash(data.filePath) : null;

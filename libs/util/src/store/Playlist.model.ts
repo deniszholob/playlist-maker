@@ -1,12 +1,14 @@
 export interface Playlist {
   /** Path of the playlist file itself */
-  path: string;
+  path: string | null;
   /** Data related to the songs in the playlist */
-  songData: FullSongData[];
+  songData: FullSongData[] | null;
   /** True if song paths where validated */
   validated: boolean;
+  totalSongs: number;
+  validSongs: number;
   /** Read in data from FileReader or whatever */
-  data?: string;
+  data?: string | null;
 }
 
 export interface FullSongData extends PlaylistSong, Song {}
@@ -30,7 +32,7 @@ export interface Song {
   album?: string;
   track?: number;
   totalTracks?: number;
-  image?: SongImage | null;
+  image?: SongImage;
   currentTime?: number;
 }
 
@@ -39,3 +41,11 @@ export interface SongImage {
   name?: string;
   description?: string;
 }
+
+export enum SongsValid {
+  all = 'all',
+  some = 'some',
+  none = 'none',
+}
+
+// TODO: Make a Playlist class instead?

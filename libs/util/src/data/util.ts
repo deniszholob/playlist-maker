@@ -1,9 +1,5 @@
-// https://momentjs.com/docs/#/use-it/
-import { utc, duration } from 'moment';
-import { getPlaylistEncoding } from './files.const';
-
-/** "/" or "\" */
-export type Separator = '/' | '\\';
+import { Separator } from '../store/AppStore.model';
+import { getPlaylistEncoding } from './file-types';
 
 /**
  * Convert Windows backslash paths to slash paths: `foo\\bar` -> `foo/bar`
@@ -15,7 +11,7 @@ export type Separator = '/' | '\\';
  * @see http://superuser.com/a/176395/6877
  * @see https://github.com/sindresorhus/slash
  */
-export function slash(path: string, sep: Separator = '\\') {
+export function slash(path: string, sep: Separator = '/') {
   const isExtendedLengthPath = /^\\\\\?\\/.test(path);
   // eslint-disable-next-line no-control-regex
   const hasNonAscii = /[^\u0000-\u0080]+/.test(path);
@@ -25,15 +21,6 @@ export function slash(path: string, sep: Separator = '\\') {
   }
 
   return path.replace(/\\/g, sep);
-}
-
-export function formatTime(time: number, format = 'HH:mm:ss') {
-  // console.log(`formatTime`, time, format)
-  const momentTime = time * 1000;
-  // const formattedTime = duration(momentTime).humanize();
-  const formattedTime = utc(momentTime).format(format);
-  // console.log(`formattedTime`,formattedTime)
-  return formattedTime;
 }
 
 export function htmlDownload(fileName: string, contents: string) {
@@ -54,4 +41,13 @@ export function htmlDownload(fileName: string, contents: string) {
 
   // Cleanup
   document.body.removeChild(element);
+}
+
+export function getFilesSelected(event: Event): File[] {
+  if (event.target instanceof HTMLInputElement) {
+    const fileList: FileList | null = event.target.files;
+    const files: File[] = fileList ? Array.from(fileList) : [];
+    return files;
+  }
+  throw new Error(`Invalid ${typeof event} event, should be HTMLInputElement`);
 }

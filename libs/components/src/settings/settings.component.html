@@ -1,0 +1,71 @@
+<div class="d-flex flex-col padding-small container">
+  <h1 class="text-center">Settings</h1>
+
+  <div class="row flex-edges margin-none">
+    <fieldset class="form-group margin-none">
+      <!-- <legend>Path Types</legend> -->
+      <label
+        for="pathsRelative"
+        class="paper-radio"
+        [attr.aria-label]="
+          !isElectron
+            ? 'Available only on Desktop due to technical limitations'
+            : null
+        "
+        data-balloon-pos="right"
+        [ngClass]="{ 'text-muted': !isElectron }"
+      >
+        <input
+          type="radio"
+          name="paths"
+          id="pathsRelative"
+          [value]="true"
+          [ngModel]="settings.relativePaths"
+          (ngModelChange)="updatePaths($event)"
+          [disabled]="!isElectron"
+        />
+        <span>Relative Paths</span>
+      </label>
+      <label
+        for="pathsAbsolute"
+        class="paper-radio"
+        [attr.aria-label]="
+          !isElectron
+            ? 'Available only on Desktop due to technical limitations'
+            : null
+        "
+        data-balloon-pos="right"
+        [ngClass]="{ 'text-muted': !isElectron }"
+      >
+        <input
+          type="radio"
+          name="paths"
+          id="pathsAbsolute"
+          [value]="false"
+          [ngModel]="settings.relativePaths"
+          (ngModelChange)="updatePaths($event)"
+          [disabled]="!isElectron"
+        />
+        <span>Absolute Paths</span>
+      </label>
+    </fieldset>
+
+    <div class="row flex-spaces margin-none">
+      <div class="alert alert-secondary row" *ngIf="settings.relativePaths">
+        <i class="fas fa-info-circle fa-2x text-primary"></i>
+        <span class="padding-left text-primary">
+          Songs will be found relative to the playlist file
+          <br />If its moved, songs will not be able to be found
+        </span>
+      </div>
+      <div class="alert alert-secondary row" *ngIf="!settings.relativePaths">
+        <i class="fas fa-info-circle fa-2x text-primary"></i>
+        <span class="padding-left text-primary">
+          Songs will be found relative to the drive
+          <br />Playlist can be moved inside the drive and songs will be found,
+          but if drive changes, songs will not be found
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

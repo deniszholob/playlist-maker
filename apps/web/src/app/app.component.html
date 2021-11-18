@@ -1,64 +1,52 @@
-<main>
+<header class="background-dark" [ngClass]="app.isElectron ? 'electron' : 'web'">
+  <div class="container padding-none d-flex row flex-edges">
+    <button
+      class="btn-small"
+      [attr.aria-label]="'Go to main screen'"
+      data-balloon-pos="right"
+      (click)="goHome()"
+    >
+      <i class="fas fa-home"></i>
+    </button>
+    <span class="padding-small text-muted" *ngIf="app.page !== Page.landing">
+      <i class="fas fa-file-audio fa-xs"></i>
+      {{ app.openedFile ? app.openedFile : 'No file Opened' }}
+    </span>
+    <button
+      class="btn-small"
+      [attr.aria-label]="settingsOpen ? 'Close Settings' : 'Open Settings'"
+      data-balloon-pos="left"
+      (click)="toggleSettings()"
+    >
+      <i class="fas fa-cogs"></i>
+    </button>
+  </div>
+</header>
+<main class="flex-scroll">
   <div
-    class="
-      flex
-      col
-      padding-small
-      text-center
-      w-full
-      justify-center
-      absolute
-      top-1/4
-    "
-    *ngIf="!playlistOpen"
+    [ngSwitch]="app.page"
+    class="d-contents"
+    [ngClass]="{ 'd-none': settingsOpen }"
   >
-    <h1 class="m-4 text-6xl text-muted">{{ appTitle }}</h1>
-    <p class="mb-6 text-2xl">
-      Create or open a playlist file in a
-      <strong>Playlist</strong>
-      folder on your music device
-    </p>
+    <plm-playlist-editor
+      class="d-contents"
+      *ngSwitchCase="Page.pEdit"
+    ></plm-playlist-editor>
 
-    <div class="flex row justify-center">
-      <button
-        (click)="newPlaylist()"
-        class="background-success"
-        style="margin-right: 1rem"
-      >
-        New Playlist
-      </button>
-      <plm-file-picker
-        (fileChange)="openPlaylist($event)"
-        [filesTypesAccepted]="FILE_ACCEPT_PLAYLIST"
-        [class]="'background-secondary'"
-      >
-        Open Playlist
-      </plm-file-picker>
-    </div>
-    <p class="mb-6 text-1xl text-muted">
-      <em>Note: </em>
-      <strong>Playlist</strong> folder should be next to your
-      <strong>Music</strong> folder for best results
-    </p>
+    <plm-playlist-validator
+      class="d-contents"
+      *ngSwitchCase="Page.pValidate"
+    ></plm-playlist-validator>
+
+    <plm-home *ngSwitchDefault class="d-contents"></plm-home>
   </div>
 
-  <div class="flex col padding-small container" *ngIf="playlistOpen">
-    <header>
-      <plm-header (closePlaylist)="onClosePlaylist()"></plm-header>
-    </header>
-    <main>
-      <div *ngIf="!((songs$ | async).length > 0)">Load Songs...</div>
-      <plm-playlist
-        class="d-contents"
-        *ngIf="(songs$ | async).length > 0"
-      ></plm-playlist>
-      <router-outlet></router-outlet>
-    </main>
-    <!--
-    <footer class="row flex-edges">
-      <plm-player class="d-contents" [song]="currentSong"></plm-player>
-    </footer>
--->
-    <footer></footer>
-  </div>
+  <plm-settings
+    class="flex-scroll settings"
+    *ngIf="settingsOpen"
+  ></plm-settings>
+
+  <!-- <router-outlet></router-outlet> -->
 </main>
+
+<plm-footer class="d-contents"></plm-footer>

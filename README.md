@@ -22,5 +22,11 @@ If you find the app or the source code useful, consider supporting me on [Patreo
 
 
 # Screenshots
-![Playlist Maker Landing](screenshots/playlist-maker-lading.png)
-![Playlist Maker Playlist](screenshots/playlist-maker-playlist.png)
+## Landing
+![Playlist Maker Landing](screenshots/playlist-maker-landing-view.png)
+## Editor
+![Playlist Maker Editor](screenshots/playlist-maker-editor-view.png)
+## Validator/Batch Fix
+![Playlist Maker Validator](screenshots/playlist-maker-validator-view.png)
+## Settings
+![Playlist Maker Editor](screenshots/playlist-maker-settings-view.png)

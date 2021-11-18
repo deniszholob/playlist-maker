@@ -1,0 +1,40 @@
+<div
+  class="d-flex flex-col padding-small text-center w-full flex-justify-center"
+>
+  <h1 class="m-4 text-6xl text-muted">{{ appTitle }}</h1>
+  <p class="mb-6 text-2xl">
+    Create or open a playlist file in a
+    <strong>Playlist</strong>
+    folder on your music device
+  </p>
+
+  <div class="flex row flex-justify-center">
+    <button
+      (click)="newPlaylist()"
+      class="background-success"
+      style="margin-right: 1rem"
+    >
+      New Playlist
+    </button>
+    <plm-file-picker
+      (fileChange)="openPlaylist($event)"
+      [filesTypesAccepted]="FILE_ACCEPT_PLAYLIST"
+      [class]="'background-secondary'"
+    >
+      Open Playlist
+    </plm-file-picker>
+    <button
+      *ngIf="(appStore$ | async)?.isElectron"
+      (click)="fixPlaylists()"
+      class="background-warning-dark"
+      style="margin-left: 1rem"
+    >
+      Fix Playlists
+    </button>
+  </div>
+  <p class="mb-6 text-1xl text-muted">
+    <em>Note: </em>
+    <strong>Playlist</strong> folder should be next to your
+    <strong>Music</strong> folder for best results
+  </p>
+</div>

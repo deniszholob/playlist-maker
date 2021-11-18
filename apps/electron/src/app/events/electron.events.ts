@@ -32,8 +32,12 @@ ipcMain.handle(EVENT_CHANNELS.e_get_song_path, (event, arg) =>
 ipcMain.handle(EVENT_CHANNELS.e_check_file_path, (event, arg) =>
   handler.doesFilePathExist(arg)
 );
+ipcMain.handle(EVENT_CHANNELS.e_open_playlist_folder, (event, arg) =>
+  handler.openPlaylistFolder(arg)
+);
 
 // Retrieve app version
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 ipcMain.handle('get-app-version', (event): string => {
   if (!environment.production) {
     console.log(`Fetching application version... [v${environment.version}]`);

@@ -8,6 +8,7 @@ import {
   PlaylistSong,
   PlaylistStoreService,
 } from '@plm/util';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'plm-playlist',
@@ -16,7 +17,9 @@ import {
 })
 export class PlaylistComponent {
   public tableColumns = ['Action', 'Title', 'Duration', 'Album', 'Track'];
-  public songs$ = this.playlistStoreService.getStoreSongs();
+  public songs$ = this.playlistStoreService
+    .getStoreSongs()
+    .pipe(map((s) => (s ? s : [])));
 
   constructor(
     private playlistStoreService: PlaylistStoreService,
@@ -26,37 +29,42 @@ export class PlaylistComponent {
 
   public fixSongPath(song: PlaylistSong) {
     // console.log(`fixSongPath`, song);
-    this.ioService.fixPathsBasedOn(song.path).subscribe();
+    const playlist = this.playlistStoreService.getSnapshot();
+    this.ioService
+      .fixPathsInPlaylistBasedOn(song.path, playlist)
+      .subscribe((playlist) => {
+        this.playlistStoreService.setSongs(playlist.songData ?? []);
+        this.appStoreService.setUnsavedChanges();
+      });
   }
 
   public onDeleteSong(i: number) {
     // console.log(`onDeleteSong`, i);
-    const playlistState = this.playlistStoreService.getState();
-    const currentSongs = [...playlistState.songData];
+    const playlistState = this.playlistStoreService.getSnapshot();
+    const currentSongs = playlistState.songData
+      ? [...playlistState.songData]
+      : [];
     currentSongs.splice(i, 1);
-    this.playlistStoreService.setState({
-      ...playlistState,
-      songData: currentSongs,
-    });
+    this.playlistStoreService.setSongs(currentSongs);
+    this.appStoreService.setUnsavedChanges();
   }
 
-  public onSelectSong(song: PlaylistSong) {
+  public onSelectSong(selectedSong: PlaylistSong) {
     // console.log(`onSelectSong`, song);
-    const appstate = this.appStoreService.getState();
-    this.appStoreService.setState({ ...appstate, selectedSong: song });
+    this.appStoreService.setSong(selectedSong);
   }
 
   // Drag and drop
   public drop(event: CdkDragDrop<string[]>) {
     // console.log(`drop`, event);
-    const playlistState = this.playlistStoreService.getState();
+    const playlistState = this.playlistStoreService.getSnapshot();
     // Rearrange the data in the array
-    const currentSongs = [...playlistState.songData];
+    const currentSongs = playlistState.songData
+      ? [...playlistState.songData]
+      : [];
     moveItemInArray(currentSongs, event.previousIndex, event.currentIndex);
     // Publish a new version of the data into the datasource
-    this.playlistStoreService.setState({
-      ...playlistState,
-      songData: currentSongs,
-    });
+    this.playlistStoreService.setSongs(currentSongs);
+    this.appStoreService.setUnsavedChanges();
   }
 }
