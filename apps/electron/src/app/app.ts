@@ -1,12 +1,8 @@
-import {
-  BrowserWindow,
-  //  Menu,
-  screen,
-  shell,
-} from 'electron';
+import { BrowserWindow, Menu, screen, shell } from 'electron';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
+import { AppMenu } from './app-menu';
 import { rendererAppName, rendererAppPort } from './constants';
 
 const DEFAULT_RESOLUTION = {
@@ -71,16 +67,15 @@ export default class App {
   }
 
   private static initMenu() {
-    if (!App.isDevelopmentMode()) {
-      if (!App.mainWindow) {
-        throw new Error('Electron window is null!');
-      }
-      App.mainWindow.setMenu(null);
-    }
-    // App.mainWindow.setMenu(null);
-    // const template = AppMenu.getMenuTemplate();
-    // const menu = Menu.buildFromTemplate(template);
-    // Menu.setApplicationMenu(menu);
+    // if (!App.isDevelopmentMode()) {
+    //   if (!App.mainWindow) {
+    //     throw new Error('Electron window is null!');
+    //   }
+    //   App.mainWindow.setMenu(null);
+    // }
+    const template = AppMenu.getMenuTemplate();
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
   }
 
   private static initMainWindow() {

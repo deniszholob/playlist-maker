@@ -2,16 +2,12 @@
 # @author Denis Zholob (deniszholob.com)
 # ====================================== #
 
-name: Build Test Deploy
+name: Build Test Branch
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [main]
-  # pull_request:
-  #   branches: [ main ]
-
+  # Run on PRs
+  pull_request:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -160,104 +156,3 @@ jobs:
             dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe
             ./Playlist Maker ${{env.RELEASE_VERSION}}.zip
           if-no-files-found: error
-
-  # ========================================================================== #
-  # Ref: https://focisolutions.com/2020/04/github-actions-deploying-an-angular-app/
-  # ========================================================================== #
-  deploy-web:
-    runs-on: ubuntu-latest
-    needs: build-web
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Download build
-        uses: actions/download-artifact@v2
-        with:
-          name: web-demo-build
-          path: web-demo-build
-
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: web-demo-build
-
-      # ---------------------------- Deployment ------------------------------ #
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
-        with:
-          BRANCH: gh-pages
-          FOLDER: web-demo-build
-
-  # ========================================================================== #
-  # Ref: https://github.com/actions/create-release
-  # ========================================================================== #
-  release:
-    # if: github.event == 'push'
-    runs-on: ubuntu-latest
-    needs: [get-release-version, build-windows]
-    env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}} # This token is provided by Actions, you do not need to create your own token
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14.17.0'
-
-      - name: Download RELEASE_VERSION
-        uses: actions/download-artifact@v2
-        with:
-          name: RELEASE_VERSION
-
-      - name: Set RELEASE_VERSION env var
-        shell: bash
-        run: |
-          echo "RELEASE_VERSION=`cat RELEASE_VERSION.txt`" >> $GITHUB_ENV
-
-      - name: Download build
-        uses: actions/download-artifact@v2
-        with:
-          name: release-package-${{env.RELEASE_VERSION}}
-          path: release-package-${{env.RELEASE_VERSION}}
-
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: release-package-${{env.RELEASE_VERSION}}
-
-      - name: Check Tags
-        uses: mukunku/tag-exists-action@v1.0.0
-        id: checkTag
-        with:
-          tag: v${{env.RELEASE_VERSION}}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # -------------------------- Release ----------------------------------- #
-      - name: Create Release
-        if: steps.checkTag.outputs.exists
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-          name: Playlist Maker v${{env.RELEASE_VERSION}}
-          tag: v${{env.RELEASE_VERSION}}
-          bodyFile: .github/workflows/release-body.md
-          body: |
-            [<img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/playlist-maker-download.png" width="200" />](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe)
-
-            > * Click on the `dropdown` => `keep` in Chrome
-            > * <img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/download-warning.png" width="300" />
-            > * Click on `More info` => `Run anyway` on the Windows Protection screen
-            > * <img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/windows-warning-info.png" width="335" />
-            >   <img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/windows-warning.png" width="260" />
-            > * Antivirus will probably alert and scan for a couple seconds.
-
-            ### If you want a "portable"/non-installable node-version
-            * Download the [Playlist.Maker.${{env.RELEASE_VERSION}}.zip](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.${{env.RELEASE_VERSION}}.zip)
-            * Extract the contents into a new folder
-            * Inside the folder double click on the .exe file in the new extracted folder.
-          artifacts: |
-            release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,
-            release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip
-          artifactErrorsFailBuild: true
-          draft: false # true to create a draft (unpublished) release, false to create a published one. Default: false

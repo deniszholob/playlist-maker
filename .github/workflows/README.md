@@ -7,6 +7,7 @@
 * https://github.com/marketplace/actions/deploy-to-github-pages
 * https://github.com/marketplace/actions/cache
 * https://github.com/marketplace/actions/create-release
+* https://github.com/marketplace/actions/tag-exists-action
 
 # Docs
 * [passing-data-between-jobs-in-a-workflowh](ttps://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow)
