@@ -252,7 +252,7 @@ jobs:
             >   <img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/windows-warning.png" width="260" />
             > * Antivirus will probably alert and scan for a couple seconds.
 
-            ### If you want a "portable"/non-installable node-version
+            ### If you want a "portable"/non-installable version
             * Download the [Playlist.Maker.${{env.RELEASE_VERSION}}.zip](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.${{env.RELEASE_VERSION}}.zip)
             * Extract the contents into a new folder
             * Inside the folder double click on the .exe file in the new extracted folder.

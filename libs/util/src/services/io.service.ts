@@ -163,7 +163,8 @@ export class IoService {
       songs = musicData.map((music: string): PlaylistSong => {
         const songData: string[] = music.split('\n');
         const metaData: string[] = songData[0].split(',');
-        const songPath: string = decodeURI(songData[1].replace('file:///', ''));
+        let songPath: string = songData[1].replace('file:///', '');
+        songPath = decodeURIComponent(songPath);
         return {
           // path: songPath,
           path: slash(songPath),
