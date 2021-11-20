@@ -15,7 +15,7 @@ import {
   PlaylistStoreService,
 } from '@plm/util';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'plm-header',
@@ -73,14 +73,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // console.log(`openFiles`, event);
     const files: File[] = getFilesSelected(event);
     this.areSongsLoading = true;
-    this.ioService.readAudioFilesData(files).subscribe(
-      () => (this.areSongsLoading = false),
-      () => (this.areSongsLoading = false)
-    );
+    this.appStoreService.setLoading();
+    this.ioService
+      .readAudioFilesData(files)
+      .pipe(take(1))
+      .subscribe(
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        () => {},
+        (err) => {
+          console.error(err);
+          alert(err);
+        },
+        () => {
+          this.areSongsLoading = false;
+          this.appStoreService.setLoading(false);
+        }
+      );
   }
 
   public save() {
     const playlist = this.playlistStoreService.getSnapshot();
+    this.appStoreService.setLoading();
     this.ioService
       .exportPlaylist(
         playlist,
@@ -91,8 +104,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
           alert(res);
         },
         (err) => {
-          alert('Error Saving Playlist');
           console.error(err);
+          alert('Error Saving Playlist');
+        },
+        () => {
+          this.appStoreService.setLoading(false);
         }
       );
   }

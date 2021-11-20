@@ -82,11 +82,11 @@ export class AppStoreService extends Store<AppStore> {
     });
   }
 
-  public setLoading() {
+  public setLoading(loading = true) {
     // console.log(`setLoading`, loading);
     this.setState({
       ...this.getSnapshot(),
-      loading: true,
+      loading,
     });
   }
 

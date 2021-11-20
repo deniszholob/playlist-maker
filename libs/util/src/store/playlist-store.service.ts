@@ -11,7 +11,6 @@ import { Store } from './Store';
 export class PlaylistStoreService extends Store<Playlist> {
   constructor() {
     super({
-      validated: false,
       data: null,
       path: null,
       songData: [],
@@ -30,7 +29,6 @@ export class PlaylistStoreService extends Store<Playlist> {
     this.setState({
       path: null,
       songData: [],
-      validated: false,
       totalSongs: 0,
       validSongs: 0,
       data: null,
@@ -44,14 +42,13 @@ export class PlaylistStoreService extends Store<Playlist> {
     // console.log(`reset`, this.getSnapshot());
   }
 
-  public setSongs(songData: FullSongData[], validated: boolean | null = null) {
+  public setSongs(songData: FullSongData[]) {
     const state = this.getSnapshot();
     this.setState({
       ...state,
       songData: [...songData],
       totalSongs: this.getTotalSongs(songData),
       validSongs: this.getValidSongCount(songData),
-      validated: validated !== null ? validated : state.validated,
     });
     // console.log(`setSongs`, this.getSnapshot());
   }

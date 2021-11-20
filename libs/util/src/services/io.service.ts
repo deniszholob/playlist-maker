@@ -90,7 +90,6 @@ export class IoService {
           const songData = this.parsePlaylistSongs(data, path);
           const playlist: Playlist = {
             path,
-            validated: false,
             totalSongs: this.playlistStoreService.getTotalSongs(songData),
             validSongs: 0,
             songData,

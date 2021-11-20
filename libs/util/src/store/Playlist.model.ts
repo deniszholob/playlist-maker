@@ -3,8 +3,6 @@ export interface Playlist {
   path: string | null;
   /** Data related to the songs in the playlist */
   songData: FullSongData[] | null;
-  /** True if song paths where validated */
-  validated: boolean;
   totalSongs: number;
   validSongs: number;
   /** Read in data from FileReader or whatever */

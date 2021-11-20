@@ -10,6 +10,7 @@ export class AppComponent implements OnInit {
   public Page = Page;
   public app = this.appStoreService.getSnapshot();
   public settingsOpen = false;
+  public loading = false;
 
   constructor(
     private appStoreService: AppStoreService,
@@ -21,6 +22,7 @@ export class AppComponent implements OnInit {
     // this.playlistService.getStore();
     this.appStoreService.getStore().subscribe((appStore) => {
       this.app = appStore;
+      this.loading = appStore.loading;
     });
   }
 

@@ -8,10 +8,12 @@
     >
       <i class="fas fa-home"></i>
     </button>
+
     <span class="padding-small text-muted" *ngIf="app.page !== Page.landing">
       <i class="fas fa-file-audio fa-xs"></i>
       {{ app.openedFile ? app.openedFile : 'No file Opened' }}
     </span>
+
     <button
       class="btn-small"
       [attr.aria-label]="settingsOpen ? 'Close Settings' : 'Open Settings'"
@@ -22,31 +24,41 @@
     </button>
   </div>
 </header>
-<main class="flex-scroll">
-  <div
-    [ngSwitch]="app.page"
-    class="d-contents"
-    [ngClass]="{ 'd-none': settingsOpen }"
-  >
-    <plm-playlist-editor
-      class="d-contents"
-      *ngSwitchCase="Page.pEdit"
-    ></plm-playlist-editor>
 
-    <plm-playlist-validator
-      class="d-contents"
-      *ngSwitchCase="Page.pValidate"
-    ></plm-playlist-validator>
-
-    <plm-home *ngSwitchDefault class="d-contents"></plm-home>
+<main class="flex-scroll pos-relative">
+  <!-- Loader for Content -->
+  <div class="overlay loader" *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Loading...</span>
   </div>
 
-  <plm-settings
-    class="flex-scroll settings"
-    *ngIf="settingsOpen"
-  ></plm-settings>
+  <!-- Content -->
+  <div class="flex-scroll loaded-content" [class.blur]="loading">
+    <div
+      [ngSwitch]="app.page"
+      class="d-contents"
+      [ngClass]="{ 'd-none': settingsOpen }"
+    >
+      <plm-playlist-editor
+        class="d-contents"
+        *ngSwitchCase="Page.pEdit"
+      ></plm-playlist-editor>
+
+      <plm-playlist-validator
+        class="d-contents"
+        *ngSwitchCase="Page.pValidate"
+      ></plm-playlist-validator>
+
+      <plm-home *ngSwitchDefault class="d-contents"></plm-home>
+    </div>
+
+    <plm-settings
+      class="flex-scroll settings"
+      *ngIf="settingsOpen"
+    ></plm-settings>
+  </div>
 
   <!-- <router-outlet></router-outlet> -->
 </main>
 
-<plm-footer class="d-contents"></plm-footer>
+<plm-footer></plm-footer>

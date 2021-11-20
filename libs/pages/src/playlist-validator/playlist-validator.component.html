@@ -17,7 +17,7 @@
       class="background-secondary margin-small"
       (click)="openPlaylist($event)"
     >
-      Open Playlist in Playlist folder
+      Open Playlist folder
     </button>
     <div
       *ngIf="this.openedDir && !invalidPlaylistSong"
@@ -153,29 +153,40 @@
     [currentStep]="currentStep"
     (openStep)="openStep($event)"
   >
-    <div class="alert alert-success">
+    <div class="alert alert-success" *ngIf="!invalidPlaylistSong">
       <i class="fas fa-check fa-xs text-primary"></i>
       <span class="text-primary">
         <em>{{ this.openedDir }}</em> has all valid playlists!
       </span>
     </div>
-    <button
-      (click)="saveAll()"
-      [attr.aria-label]="
-        !invalidPlaylistSong
-          ? 'Save All Loaded Playlists'
-          : 'There are still invalid locations, please fix them'
-      "
-      data-balloon-pos="right"
-      [ngClass]="
-        !invalidPlaylistSong
-          ? 'background-secondary'
-          : 'background-warning-dark'
-      "
-      [disabled]="invalidPlaylistSong"
-    >
-      <i class="fas fa-exclamation" *ngIf="invalidPlaylistSong"></i>
-      Save All
-    </button>
+    <div class="d-flex flex-justify-center">
+      <button
+        (click)="saveAll()"
+        [attr.aria-label]="
+          !invalidPlaylistSong
+            ? 'Save All Loaded Playlists'
+            : 'There are still invalid locations, please fix them'
+        "
+        data-balloon-pos="left"
+        [ngClass]="
+          !invalidPlaylistSong
+            ? 'background-success'
+            : 'background-warning-dark'
+        "
+        [disabled]="invalidPlaylistSong"
+      >
+        <i class="fas fa-exclamation" *ngIf="invalidPlaylistSong"></i>
+        Save All
+      </button>
+      <button
+        (click)="saveValidPlaylists()"
+        [attr.aria-label]="'Save only the valid playlists'"
+        data-balloon-pos="right"
+        class="background-secondary margin-left"
+        [disabled]="this.totalValidSongs <= 0"
+      >
+        Save Valid Playlists
+      </button>
+    </div>
   </plm-step>
 </div>
