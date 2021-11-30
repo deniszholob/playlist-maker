@@ -13,9 +13,9 @@ import {
   name: 'formatDuration',
 })
 export class FormatDurationPipe implements PipeTransform {
-  transform(duration: number): string {
+  transform(duration: number | undefined): string {
     // console.log(`FormatDurationPipe`, duration)
-    return this.formatTime(duration);
+    return duration ? this.formatTime(duration) : '0';
   }
 
   /** @see https://momentjs.com/docs/#/use-it/ */

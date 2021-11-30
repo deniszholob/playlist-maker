@@ -11,7 +11,19 @@
     <tr cdk-row *cdkRowDef="let row; columns: tableColumns" cdkDrag></tr>
 
     <ng-container cdkColumnDef="Action">
-      <th cdk-header-cell *cdkHeaderCellDef>Action</th>
+      <th cdk-header-cell *cdkHeaderCellDef>
+        Action
+        <i
+          class="fas fa-check"
+          [ngClass]="
+            playlist.validSongs !== playlist.totalSongs
+              ? playlist.validSongs !== 0
+                ? 'fa-exclamation text-orange'
+                : 'fa-exclamation text-red'
+              : 'fa-check text-green'
+          "
+        ></i>
+      </th>
       <td cdk-cell *cdkCellDef="let song; let i = index">
         <button class="text-red btn-small" (click)="onDeleteSong(i)">
           <i class="fas fa-times"></i>
@@ -32,7 +44,7 @@
     </ng-container>
 
     <ng-container cdkColumnDef="Title">
-      <th cdk-header-cell *cdkHeaderCellDef>Title</th>
+      <th cdk-header-cell *cdkHeaderCellDef>Title & Artist</th>
       <td
         cdk-cell
         *cdkCellDef="let song; let i = index"
@@ -55,9 +67,13 @@
     </ng-container>
 
     <ng-container cdkColumnDef="Duration">
-      <th cdk-header-cell *cdkHeaderCellDef><i class="far fa-clock"></i></th>
+      <th cdk-header-cell *cdkHeaderCellDef>
+        <i class="far fa-clock"></i>
+        <span> {{ playlist.totalSeconds | formatDuration }}</span>
+      </th>
       <td cdk-cell *cdkCellDef="let song; let i = index">
-        {{ song.seconds | formatDuration }}
+        <i class="fas fa-clock"></i>
+        <span> {{ song.seconds | formatDuration }}</span>
       </td>
     </ng-container>
 

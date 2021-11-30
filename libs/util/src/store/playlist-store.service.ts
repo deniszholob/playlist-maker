@@ -29,6 +29,7 @@ export class PlaylistStoreService extends Store<Playlist> {
     this.setState({
       path: null,
       songData: [],
+      totalSeconds: 0,
       totalSongs: 0,
       validSongs: 0,
       data: null,
@@ -47,6 +48,7 @@ export class PlaylistStoreService extends Store<Playlist> {
     this.setState({
       ...state,
       songData: [...songData],
+      totalSeconds: this.getTotalSongTime(songData),
       totalSongs: this.getTotalSongs(songData),
       validSongs: this.getValidSongCount(songData),
     });
@@ -61,5 +63,9 @@ export class PlaylistStoreService extends Store<Playlist> {
   /** @deprecated // TODO: Move into a new Playlist Class? */
   public getValidSongCount(songs: PlaylistSong[]): number {
     return songs.filter((s) => s.validPath).length;
+  }
+  /** @deprecated // TODO: Move into a new Playlist Class? */
+  public getTotalSongTime(songs: PlaylistSong[]) {
+    return songs.map((s) => s.seconds).reduce((prev, curr) => prev + curr, 0);
   }
 }

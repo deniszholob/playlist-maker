@@ -1,31 +1,50 @@
 // https://howtomake.software/blog/draggable-table-with-angular-cdk
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   AppStoreService,
   IoService,
   PlaylistSong,
   PlaylistStoreService,
 } from '@plm/util';
-import { map } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'plm-playlist',
   templateUrl: './playlist.component.html',
   // styleUrls: ['./playlist.component.scss'],
 })
-export class PlaylistComponent {
+export class PlaylistComponent implements OnInit, OnDestroy {
   public tableColumns = ['Action', 'Title', 'Duration', 'Album', 'Track'];
+  public playlist = this.playlistStoreService.getSnapshot();
   public songs$ = this.playlistStoreService
     .getStoreSongs()
     .pipe(map((s) => (s ? s : [])));
+
+  // Clear subscriptions when component is destroyed to prevent leaks
+  private clearSubscriptions = new Subject();
 
   constructor(
     private playlistStoreService: PlaylistStoreService,
     private appStoreService: AppStoreService,
     private ioService: IoService
   ) {}
+
+  ngOnInit(): void {
+    this.playlistStoreService
+      .getStore()
+      .pipe(takeUntil(this.clearSubscriptions))
+      .subscribe((pl) => {
+        this.playlist = pl;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.clearSubscriptions.next();
+    this.clearSubscriptions.complete();
+  }
 
   public fixSongPath(song: PlaylistSong) {
     // console.log(`fixSongPath`, song);
