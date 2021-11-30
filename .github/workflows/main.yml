@@ -236,12 +236,11 @@ jobs:
       # -------------------------- Release ----------------------------------- #
       - name: Create Release
         if: steps.checkTag.outputs.exists
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.8.10
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           name: Playlist Maker v${{env.RELEASE_VERSION}}
           tag: v${{env.RELEASE_VERSION}}
-          bodyFile: .github/workflows/release-body.md
           body: |
             [<img src="https://github.com/deniszholob/playlist-maker/raw/main/screenshots/playlist-maker-download.png" width="200" />](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.Setup.${{env.RELEASE_VERSION}}.exe)
 
@@ -256,6 +255,8 @@ jobs:
             * Download the [Playlist.Maker.${{env.RELEASE_VERSION}}.zip](https://github.com/deniszholob/playlist-maker/releases/download/v${{env.RELEASE_VERSION}}/Playlist.Maker.${{env.RELEASE_VERSION}}.zip)
             * Extract the contents into a new folder
             * Inside the folder double click on the .exe file in the new extracted folder.
+
+            ### Changes
           artifacts: |
             release-package-${{env.RELEASE_VERSION}}/dist/executables/Playlist Maker Setup ${{env.RELEASE_VERSION}}.exe,
             release-package-${{env.RELEASE_VERSION}}/Playlist Maker ${{env.RELEASE_VERSION}}.zip
