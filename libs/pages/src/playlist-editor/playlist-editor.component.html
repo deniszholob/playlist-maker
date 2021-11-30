@@ -1,6 +1,9 @@
-<div class="d-flex flex-col padding-small container">
-  <plm-header (closePlaylist)="onClosePlaylist()"></plm-header>
-  <div class="flex-scroll">
+<div class="d-flex flex-col w-full">
+  <plm-header
+    class="container padding-small"
+    (closePlaylist)="onClosePlaylist()"
+  ></plm-header>
+  <div class="container flex-scroll">
     <div *ngIf="!(songs.length > 0)">Load Songs...</div>
     <plm-playlist class="d-contents" *ngIf="songs.length > 0"></plm-playlist>
   </div>

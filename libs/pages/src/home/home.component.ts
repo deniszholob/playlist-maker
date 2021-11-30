@@ -35,7 +35,6 @@ export class HomeComponent implements OnInit {
   }
 
   public newPlaylist() {
-    this.appStoreService.setLoading();
     this.ioService.createNewPlaylist().subscribe((playlist) => {
       this.appStoreService.setPage(Page.pEdit);
       this.appStoreService.setFile(playlist.path);
