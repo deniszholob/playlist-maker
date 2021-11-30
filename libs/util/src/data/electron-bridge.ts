@@ -48,6 +48,7 @@ export interface ElectronWindowApi extends ElectronWindowApiRendererEvents {
 export interface MyFile {
   path: string;
   data: string;
+  encoding: BufferEncoding;
 }
 
 export interface PlaylistDir {

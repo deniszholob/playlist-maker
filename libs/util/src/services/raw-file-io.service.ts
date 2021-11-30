@@ -2,15 +2,19 @@ import { Injectable } from '@angular/core';
 import { from, fromEvent, Observable, of, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
+  changeExtension,
   ElectronWindow,
   ElectronWindowApi,
   ERRORS,
   FILE_ENCODING_M3U8,
   FILE_ENCODING_M3U_WINDOWS,
+  getExtensionFromEncoding,
+  getPlaylistEncoding,
   htmlDownload,
   MyFile,
 } from '../data';
 import { PlaylistDir } from '../data/electron-bridge';
+import { EncodingOptions } from '../store';
 
 /** Do not use directly in components, user StateService instead */
 @Injectable({ providedIn: 'root' })
@@ -176,27 +180,43 @@ export class RawFileIOService {
    * @param location system path OR local storage key in web mode
    * @param fileContents data to save
    */
-  public writeFile(location: string, fileContents: string): Observable<string> {
-    // console.log(`writeFile() - `, location, fileContents);
-    const myFile: MyFile = {
-      path: location,
+  public writeFile(
+    location: string,
+    fileContents: string,
+    encodingSetting: EncodingOptions
+  ): Observable<string> {
+    // console.log(`writeFile() - `, location, fileContents, encodingSetting);
+    const encoding: BufferEncoding =
+      encodingSetting === EncodingOptions.original
+        ? getPlaylistEncoding(location.toString())
+        : encodingSetting;
+
+    const path =
+      encodingSetting === EncodingOptions.original
+        ? location
+        : changeExtension(location, getExtensionFromEncoding(encodingSetting));
+
+    const file: MyFile = {
+      path,
       data: fileContents,
+      encoding,
     };
     return (
-      this.electron ? this.writeFileElectron(myFile) : this.writeFileWeb(myFile)
+      this.electron ? this.writeFileElectron(file) : this.writeFileWeb(file)
     ).pipe(
-      map(() => `${this.electron ? 'Saved to' : 'Downloaded'} ${myFile.path}`)
+      map(() => `${this.electron ? 'Saved to' : 'Downloaded'} ${file.path}`)
     );
   }
 
-  private writeFileElectron(myFile: MyFile): Observable<void> {
-    // console.log(`  writeFileElectron() - `, myFile);
+  private writeFileElectron(file: MyFile): Observable<void> {
+    // console.log(`  writeFileElectron() - `, file);
     if (!this.electron) return throwError('Electron is not available!');
-    return from(this.electron.writeFile(myFile));
+    return from(this.electron.writeFile(file));
   }
 
-  private writeFileWeb(myFile: MyFile): Observable<void> {
-    const fileName = myFile.path.toString();
-    return of(htmlDownload(fileName, myFile.data));
+  private writeFileWeb(file: MyFile): Observable<void> {
+    // console.log(`  writeFileWeb() - `, file);
+    // const fileName = file.path.toString();
+    return of(htmlDownload(file));
   }
 }

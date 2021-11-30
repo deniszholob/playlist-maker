@@ -5,7 +5,13 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { AppStore, AppStoreService, Settings } from '@plm/util';
+import {
+  AppStore,
+  AppStoreService,
+  EncodingOptions,
+  EncodingOptionsLabels,
+  Settings,
+} from '@plm/util';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -15,6 +21,8 @@ import { takeUntil } from 'rxjs/operators';
   // styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent implements OnInit, OnDestroy {
+  public EncodingOptionsLabels = EncodingOptionsLabels;
+  public encoding: EncodingOptions[] = Object.values(EncodingOptions);
   @Output()
   public closeSettings = new EventEmitter();
 
@@ -44,6 +52,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   public updatePaths(relativePaths: boolean) {
     this.appStoreService.setSettings({ relativePaths });
+  }
+
+  public updateEncoding(encoding: EncodingOptions) {
+    this.appStoreService.setSettings({ encoding });
   }
 
   public onCloseSettings() {

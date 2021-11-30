@@ -75,3 +75,10 @@ function getCsvAcceptedExtensions(filter: FileFilter[]): string {
 export function getPlaylistEncoding(path: string): BufferEncoding {
   return path.endsWith('.m3u8') ? FILE_ENCODING_M3U8 : FILE_ENCODING_M3U_ASCII;
 }
+
+export function getExtensionFromEncoding(encoding: BufferEncoding) {
+  // console.log(`getExtensionFromEncoding`, encoding);
+  const ext = encoding === 'utf8' || encoding === `utf-8` ? '.m3u8' : '.m3u';
+  // console.log(`ext`, ext);
+  return ext;
+}

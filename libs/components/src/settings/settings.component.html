@@ -1,6 +1,20 @@
 <div class="d-flex flex-col padding-small container">
   <h1 class="text-center">Settings</h1>
 
+  <div class="form-group">
+    <label for="setting-encoding" class="padding-right-small">Encoding</label>
+    <select
+      id="setting-encoding"
+      class="d-inline-block"
+      [ngModel]="settings.encoding"
+      (ngModelChange)="updateEncoding($event)"
+    >
+      <option *ngFor="let option of encoding" [value]="option">
+        {{ EncodingOptionsLabels[option] }}
+      </option>
+    </select>
+  </div>
+
   <div class="row flex-edges margin-none">
     <fieldset class="form-group margin-none">
       <!-- <legend>Path Types</legend> -->

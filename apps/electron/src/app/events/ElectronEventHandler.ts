@@ -3,7 +3,6 @@ import {
   FILE_ACCEPT_PLAYLIST,
   FILE_FILTERS_MUSIC,
   FILE_FILTERS_PLAYLIST,
-  getPlaylistEncoding,
   MyFile,
   PlaylistDir,
   slash,
@@ -30,8 +29,7 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
     if (!environment.production) {
       // console.log(`writeFile() - `, file);
     }
-    const encoding: BufferEncoding = getPlaylistEncoding(file.path.toString());
-    const data = await writeFile(file.path, file.data, encoding);
+    const data = await writeFile(file.path, file.data, file.encoding);
     return data;
   }
 
@@ -100,17 +98,20 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
       const newPathParsed = parse(newPath);
       const oldPathParsed = parse(oldPath);
       if (newPathParsed.base !== oldPathParsed.base) {
-        dialog.showErrorBox(
-          `Song file doesn't match!`,
-          `Selected song is different from precious song.\nOLD Song: ${oldPathParsed.base}\nNEW Song: ${newPathParsed.base}`
+        // // Fail on unmatched song selection
+        // dialog.showErrorBox(
+        //   `Song file doesn't match!`,
+        //   `Selected song is different from precious song.\nOLD Song: ${oldPathParsed.base}\nNEW Song: ${newPathParsed.base}`
+        // );
+        // return null;
+
+        // Prompt on unmatched song selection (0 = cancel)
+        const response = await this.showConfirmationDialog(
+          oldPathParsed.base,
+          newPathParsed.base
         );
-        return null;
-        // return (await this.showConfirmationDialog(
-        //   oldPathParsed.base,
-        //   newPathParsed.base
-        // )) !== 0
-        //   ? slash(newPath)
-        //   : null;
+        // console.log(response);
+        return response !== 0 ? slash(newPath) : null;
       }
       // Using / instead of \ is not recognized... -_-
       return slash(newPath);
@@ -130,10 +131,10 @@ export class ElectronEventHandler implements ElectronWindowApiRendererEvents {
   ) {
     return (
       await dialog.showMessageBox({
-        title: 'Confirm Song Rename',
-        message: `Did you accidentally choose a different song or was the song renamed?\nOLD Song: ${oldBaseName}\nNEW Song: ${newBaseName}`,
+        title: 'Confirm Song',
+        message: `Selected song name doesn't seem to match.\nDid you mean to replace this song with the new selection?\nOLD Song: ${oldBaseName}\nNEW Song: ${newBaseName}`,
         type: 'warning',
-        buttons: ['Oops, Cancel', 'Yes, Rename it!'],
+        buttons: ['Oops, Cancel', 'Yes, Replace it!'],
         defaultId: 0,
         cancelId: 0,
       })

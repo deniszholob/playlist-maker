@@ -18,8 +18,6 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log();
-    // this.playlistService.getStore();
     this.appStoreService.getStore().subscribe((appStore) => {
       this.app = appStore;
       this.loading = appStore.loading;

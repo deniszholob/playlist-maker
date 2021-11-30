@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ElectronWindow } from '../data';
 
-import { AppStore, Page, Settings, SizeOptions } from './AppStore.model';
+import { ElectronWindow } from '../data';
+import {
+  AppStore,
+  EncodingOptions,
+  Page,
+  Settings,
+  SizeOptions,
+} from './AppStore.model';
 import { PlaylistSong } from './Playlist.model';
 import { Store } from './Store';
 
@@ -26,6 +32,7 @@ export class AppStoreService extends Store<AppStore> {
         darkMode: true,
         relativePaths: isElectron,
         separator: '\\',
+        encoding: EncodingOptions.original,
       },
     });
     console.debug('AppStoreService Init', this.getSnapshot());

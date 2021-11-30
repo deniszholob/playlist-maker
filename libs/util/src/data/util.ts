@@ -1,5 +1,7 @@
 import { Separator } from '../store/AppStore.model';
-import { getPlaylistEncoding } from './file-types';
+import { MyFile } from './electron-bridge';
+
+const INTERNAL_PATH_SEP = '/';
 
 /**
  * Convert Windows backslash paths to slash paths: `foo\\bar` -> `foo/bar`
@@ -11,29 +13,29 @@ import { getPlaylistEncoding } from './file-types';
  * @see http://superuser.com/a/176395/6877
  * @see https://github.com/sindresorhus/slash
  */
-export function slash(path: string, sep: Separator = '/') {
+export function slash(path: string, sep: Separator = '/', ignoreAscii = true) {
   const isExtendedLengthPath = /^\\\\\?\\/.test(path);
   // eslint-disable-next-line no-control-regex
   const hasNonAscii = /[^\u0000-\u0080]+/.test(path);
 
-  if (isExtendedLengthPath || hasNonAscii) {
+  if (isExtendedLengthPath || (hasNonAscii && !ignoreAscii)) {
     return path;
   }
 
   return path.replace(/\\/g, sep);
 }
 
-export function htmlDownload(fileName: string, contents: string) {
-  const encoding: BufferEncoding = getPlaylistEncoding(fileName);
+export function htmlDownload(file: MyFile) {
+  // const encoding: BufferEncoding = getPlaylistEncoding(fileName);
 
   // Creating an invisible element
   // <a href="path of file" download="file name">
   const element = document.createElement('a');
   element.setAttribute(
     'href',
-    `data:text/plain;charset=${encoding}, ` + encodeURIComponent(contents)
+    `data:text/plain;charset=${file.encoding}, ` + encodeURIComponent(file.data)
   );
-  element.setAttribute('download', fileName);
+  element.setAttribute('download', file.path);
   document.body.appendChild(element);
 
   // Execute a click
@@ -50,4 +52,30 @@ export function getFilesSelected(event: Event): File[] {
     return files;
   }
   throw new Error(`Invalid ${typeof event} event, should be HTMLInputElement`);
+}
+
+export function pathToArray(path: string) {
+  return path.split(INTERNAL_PATH_SEP);
+}
+
+export function pathArrayToString(pathArray: string[]): string {
+  return pathArray.join(INTERNAL_PATH_SEP);
+}
+
+export function getFileBaseNameFromPath(path: string) {
+  const pathArray = pathToArray(path);
+  const fileName = pathArray[pathArray.length - 1];
+  // const name = fileName.split('.');
+  // return name[0];
+  return fileName;
+}
+
+export function changeExtension(path: string, ext: string): string {
+  // console.log(`changeExtension`, path, ext);
+  const pathArray = pathToArray(path);
+  const fileBaseName = pathArray[pathArray.length - 1];
+  const fileName = fileBaseName.split('.');
+  pathArray[pathArray.length - 1] = fileName[0] + ext;
+  // console.log(`pathArray`, pathArray);
+  return pathArrayToString(pathArray);
 }

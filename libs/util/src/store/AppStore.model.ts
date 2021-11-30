@@ -22,6 +22,7 @@ export interface Settings {
   darkMode: boolean;
   relativePaths: boolean;
   separator: Separator;
+  encoding: EncodingOptions;
 }
 
 /** "/" or "\" */
@@ -37,4 +38,17 @@ export const SizeOptionsLabels: Record<SizeOptions, string> = {
   [SizeOptions.sm]: 'Small',
   [SizeOptions.md]: 'Medium',
   [SizeOptions.lg]: 'Large',
+};
+
+export enum EncodingOptions {
+  original = 'original',
+  utf8 = 'utf8',
+  ascii = 'ascii',
+  // 'WINDOWS-1252' = 'WINDOWS-1252',
+}
+
+export const EncodingOptionsLabels: Record<EncodingOptions, string> = {
+  [EncodingOptions.original]: 'Original',
+  [EncodingOptions.utf8]: 'UTF8 (.m3u8)',
+  [EncodingOptions.ascii]: 'ASCII (.m3u)',
 };

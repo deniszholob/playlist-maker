@@ -2,8 +2,15 @@ import { Injectable } from '@angular/core';
 import * as mm from 'music-metadata-browser';
 import { forkJoin, from, fromEvent, Observable, of } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
-import { slash } from '../data/util';
+
 import {
+  getFileBaseNameFromPath,
+  pathArrayToString,
+  pathToArray,
+  slash,
+} from '../data/util';
+import {
+  AppStoreService,
   FullSongData,
   Playlist,
   PlaylistSong,
@@ -12,7 +19,6 @@ import {
 } from '../store';
 import { RawFileIOService } from './raw-file-io.service';
 
-const PATH_SEP = '/';
 interface SR {
   search: string;
   replace: string;
@@ -29,7 +35,8 @@ export interface PlaylistDirLoaded {
 export class IoService {
   constructor(
     private rawFileIOService: RawFileIOService,
-    private playlistStoreService: PlaylistStoreService
+    private playlistStoreService: PlaylistStoreService,
+    private appStoreService: AppStoreService
   ) {}
 
   public openPlaylists(): Observable<PlaylistDirLoaded | null> {
@@ -155,21 +162,29 @@ export class IoService {
   public parsePlaylistSongs(data: string, path?: string): PlaylistSong[] {
     // console.log(`parsePlaylistSongs() - `, data);
     let songs: PlaylistSong[] = [];
+    // Dont care about carriage returns
     data = data.replace(/\r\n/g, '\n');
+    // Split file line by song entry (1st line is the metadata, 2nd is song path)
     const musicData: string[] = data.split('\n#EXTINF:');
 
+    // File should begin with this header
     if (musicData[0] === '#EXTM3U') {
+      // Dont need the header anymore...
       musicData.shift();
       songs = musicData.map((music: string): PlaylistSong => {
+        // songData = [metaData, songPath]
         const songData: string[] = music.split('\n');
+        // metaData is comma delimited
         const metaData: string[] = songData[0].split(',');
         let songPath: string = songData[1].replace('file:///', '');
         songPath = decodeURIComponent(songPath);
+        songPath = slash(songPath);
         return {
-          // path: songPath,
-          path: slash(songPath),
+          path: songPath,
           seconds: Number(metaData[0]),
-          display: String(metaData[1]),
+          display: metaData[1]
+            ? String(metaData[1])
+            : getFileBaseNameFromPath(songPath),
           validPath: false,
         };
       });
@@ -240,6 +255,7 @@ export class IoService {
 
   public fixPathsInPlaylistsBasedOn(oldPath: string, playlists: Playlist[]) {
     return this.getSR(oldPath).pipe(
+      // Dont need to do any fixing if SR is null
       filter((sr): sr is SR => sr != null),
       switchMap((sr: SR) => this.fixSongsInPlaylists(sr, playlists)),
       take(1)
@@ -248,6 +264,7 @@ export class IoService {
 
   public fixPathsInPlaylistBasedOn(oldPath: string, playlist: Playlist) {
     return this.getSR(oldPath).pipe(
+      // Dont need to do any fixing if SR is null
       filter((sr): sr is SR => sr != null),
       switchMap((sr) => this.fixSongsInPlaylist(sr, playlist)),
       take(1)
@@ -260,8 +277,13 @@ export class IoService {
 
   private fixSongsInPlaylist(sr: SR, playlist: Playlist) {
     if (!playlist.songData) throw Error('Playlist Song Data was null');
+    // Filter out valid playlist
+    if (playlist.validSongs === playlist.totalSongs) return of(playlist);
+
     const songValidationObservables = playlist.songData.map(
       (song: FullSongData) => {
+        // Filter out valid song
+        if (song.validPath) return of(song);
         const fixedSong = this.fixSong(sr, song);
         return fixedSong;
       }
@@ -280,7 +302,7 @@ export class IoService {
 
   private fixSong(sr: SR, song: FullSongData) {
     // console.log(`song before`, song, sr);
-    if (!song.validPath && song.path.match(sr.search)) {
+    if (!song.validPath && song.path.indexOf(sr.search) >= 0) {
       const newPath = song.path.replace(sr.search, sr.replace);
       return this.validateSongPath(newPath).pipe(
         map((isValid) => {
@@ -303,10 +325,9 @@ export class IoService {
     return this.rawFileIOService.getMissingSongFilePath(oldPath).pipe(
       map((path) => {
         if (!path) return null; // User cancelled the save dialog
-
-        const oldArr = oldPath.split(PATH_SEP); // file:///C:/Users/Galina/Music/Various/SongName.mp3
-        const newArr = path.split(PATH_SEP); // file:///D:/galina-songs-backup/BOBBBB/SongName.mp3
-        const sr = this.getPathDiff(oldArr, newArr, PATH_SEP);
+        const oldArr = pathToArray(oldPath); // file:///C:/Users/Galina/Music/Various/SongName.mp3
+        const newArr = pathToArray(path); // file:///D:/galina-songs-backup/BOBBBB/SongName.mp3
+        const sr = this.getPathDiff(oldArr, newArr);
         // console.log(`SEARCH/REPLACE`, sr);
         return sr;
       })
@@ -320,7 +341,7 @@ export class IoService {
    * @param sep "/"
    * @returns Search/Replace: {search: "C:/Users/Bob/Music", replace: "D:/MUSIC"}
    */
-  private getPathDiff(oldArr: string[], newArr: string[], sep: string): SR {
+  private getPathDiff(oldArr: string[], newArr: string[]): SR {
     // Strip away the common parts from the end until an inconsistency is found
     // Use that to find/replace
     while (oldArr.length > 0 && newArr.length > 0) {
@@ -333,8 +354,8 @@ export class IoService {
       newArr.pop();
     }
 
-    const rebuildUniqueOldPath = oldArr.join(sep); // C:/Users/Bob/Music
-    const rebuildUniqueNewPath = newArr.join(sep); // D:/MUSIC
+    const rebuildUniqueOldPath = pathArrayToString(oldArr); // C:/Users/Bob/Music
+    const rebuildUniqueNewPath = pathArrayToString(newArr); // D:/MUSIC
 
     return {
       search: rebuildUniqueOldPath,
@@ -372,8 +393,13 @@ export class IoService {
       }, playlistFileHeader);
 
     if (!playlist.path) throw Error('Playlist path was null');
+
     return this.rawFileIOService
-      .writeFile(playlist.path, fileContents)
+      .writeFile(
+        playlist.path,
+        fileContents,
+        this.appStoreService.getSnapshot().settings.encoding
+      )
       .pipe(take(1));
   }
 
