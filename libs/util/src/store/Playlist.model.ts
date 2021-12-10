@@ -18,6 +18,8 @@ export interface PlaylistSong {
   validPath: boolean;
   /** Absolute or relative (to the playlist) song path */
   path: string;
+  /** Absolute path used for playback */
+  absPath: string;
   /** EXTINF Song length */
   seconds: number;
   /** EXTINF Display name (usually "artist - song name") */
@@ -33,6 +35,8 @@ export interface Song {
   totalTracks?: number;
   image?: SongImage;
   currentTime?: number;
+  /** Used for playback */
+  dataUrl?: string;
 }
 
 export interface SongImage {

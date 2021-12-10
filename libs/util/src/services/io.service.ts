@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as mm from 'music-metadata-browser';
 import { forkJoin, from, fromEvent, Observable, of } from 'rxjs';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 
 import {
   getFileBaseNameFromPath,
@@ -115,6 +115,7 @@ export class IoService {
               const displaySplit = song.display.split(' - ');
               return {
                 validPath: song.validPath,
+                absPath: song.absPath,
                 path: song.path,
                 seconds: song.seconds,
                 display: song.display,
@@ -127,6 +128,45 @@ export class IoService {
             playlist.songData
           );
           return playlist;
+        }),
+        switchMap((playlist) => {
+          // console.log(
+          //   `switchMap loadAudioFiles`,
+          //   !!playlist.songData,
+          //   playlist.songData
+          // );
+          const arr = playlist.songData ? playlist.songData : [];
+          return this.loadAudioFiles(arr).pipe(
+            map((songs) => {
+              // console.log(`map loadAudioFiles`);
+              playlist.songData = songs;
+              // console.log(playlist.songData);
+              return playlist;
+            })
+          );
+        }),
+        take(1)
+      );
+  }
+
+  public loadAudioFiles(songs: FullSongData[]) {
+    // console.log(`loadAudioFiles`);
+    return forkJoin(songs.map((song) => this.loadAudioFile(song)));
+  }
+
+  public loadAudioFile(song: FullSongData) {
+    // console.log(`loadAudioFile`, song)
+    return this.rawFileIOService
+      .readFile({
+        location: song.absPath,
+        file: undefined,
+        isMediaFile: true,
+      })
+      .pipe(
+        map((data) => {
+          // console.log(`map readFile`)
+          song.dataUrl = data;
+          return song;
         }),
         take(1)
       );
@@ -144,6 +184,7 @@ export class IoService {
           playlist.path,
           false
         );
+        song.absPath = absSongPath;
         return this.validateSongPath(absSongPath).pipe(
           map((isValid: boolean): null => {
             song.validPath = isValid;
@@ -181,6 +222,7 @@ export class IoService {
         songPath = slash(songPath);
         return {
           path: songPath,
+          absPath: songPath,
           seconds: Number(metaData[0]),
           display: metaData[1]
             ? String(metaData[1])
@@ -194,7 +236,7 @@ export class IoService {
   }
 
   public readAudioFilesData(files: File[]): Observable<void> {
-    // console.log(`readData() - `, files);
+    // console.log(`readAudioFilesData() - `, files);
     return forkJoin(files.map((f) => this.readAudioFileData(f))).pipe(
       map((songs) => {
         // console.log(`readAudioFilesData | map`);
@@ -210,7 +252,7 @@ export class IoService {
   }
 
   private readAudioFileData(file: File): Observable<FullSongData> {
-    // console.log(`readData() - `, file);
+    // console.log(`readAudioFileData() - `, file);
     return from(mm.parseBlob(file)).pipe(
       map((data) => {
         // Using / instead of \ is not recognized... -_-
@@ -222,6 +264,7 @@ export class IoService {
         // console.log(`Song data`, data);
         const song: FullSongData = {
           path: location,
+          absPath: location,
           title,
           seconds: data.format.duration || 0,
           artist,

@@ -12,6 +12,9 @@
     class="row flex-edges w-full padding-small margin-none"
     *ngIf="selectedSong"
   >
-    <plm-player class="d-contents" [song]="selectedSong"></plm-player>
+    <plm-player
+      class="d-flex flex-col w-full"
+      [song]="selectedSong"
+    ></plm-player>
   </footer>
 </div>

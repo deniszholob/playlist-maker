@@ -42,14 +42,25 @@ export class HomeComponent implements OnInit {
   }
 
   public openPlaylist(openedFiles: File[]) {
+    this.appStoreService.setLoading();
     const playlistFile = openedFiles[0];
-    this.ioService
-      .readPlaylistData(null, playlistFile)
-      .subscribe((playlist) => {
+    this.ioService.readPlaylistData(null, playlistFile).subscribe(
+      (playlist) => {
         this.playlistStoreService.setNew(playlist);
         this.appStoreService.setPage(Page.pEdit);
         this.appStoreService.setFile(playlist.path);
-      });
+        console.log(`done`);
+      },
+      (err) => {
+        this.appStoreService.setLoading(false);
+        console.error(err);
+        alert(err);
+      },
+      () => {
+        this.appStoreService.setLoading(false);
+        console.log(`complete`);
+      }
+    );
   }
 }
 

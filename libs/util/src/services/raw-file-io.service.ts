@@ -114,7 +114,7 @@ export class RawFileIOService {
       isMediaFile?: boolean;
     } = { location: '', isMediaFile: false }
   ): Observable<string> {
-    // console.log(`readFile() - `, args);
+    console.log(`readFile() - `, args);
     return args.file
       ? this.readFileWeb(args.file, args.isMediaFile)
       : this.electron && location
@@ -145,7 +145,7 @@ export class RawFileIOService {
     // console.log(`  readFileWeb() - `, f, isMediaFile);
     const reader = new FileReader();
     if (isMediaFile === true) {
-      // console.log(`  readFileWeb | readAsDataURL`);
+      console.log(`  readFileWeb | readAsDataURL`);
       reader.readAsDataURL(f);
     } else {
       // console.log(`  readFileWeb | readAsText`);
@@ -162,6 +162,7 @@ export class RawFileIOService {
 
     return fromEvent<ProgressEvent<FileReader>>(reader, 'load').pipe(
       map((ev) => {
+        // console.log(`ProgressEvent - FileReader - load`)
         if (!ev.target) {
           throw new Error(`${ERRORS.ANGULAR_NO_DATA} for "${f.name}"`);
         }
