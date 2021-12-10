@@ -156,3 +156,12 @@ header {
 option {
   background: var(--main-background);
 }
+
+footer {
+  background: var(--shadow-color-hover);
+}
+
+audio {
+  width: 100%;
+  height: 25px;
+}

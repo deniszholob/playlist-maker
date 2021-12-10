@@ -17,6 +17,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PlaylistEditorComponent implements OnInit, OnDestroy {
   public songs: PlaylistSong[] = [];
+  public selectedSong: PlaylistSong | null = null;
 
   // Clear subscriptions when component is destroyed to prevent leaks
   private clearSubscriptions = new Subject();
@@ -31,8 +32,16 @@ export class PlaylistEditorComponent implements OnInit, OnDestroy {
       .getStoreSongs()
       .pipe(takeUntil(this.clearSubscriptions))
       .subscribe((songs) => {
+        const haveSongs = this.songs.length > 0;
         this.songs = songs ? songs : [];
+        if (!haveSongs && this.songs.length > 0) {
+          this.appStoreService.setSong(this.songs[0]);
+        }
       });
+    this.appStoreService
+      .getSelectedSong()
+      .pipe(takeUntil(this.clearSubscriptions))
+      .subscribe((song) => (this.selectedSong = song));
   }
 
   ngOnDestroy(): void {

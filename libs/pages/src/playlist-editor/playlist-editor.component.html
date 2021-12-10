@@ -7,10 +7,11 @@
     <div *ngIf="!(songs.length > 0)">Load Songs...</div>
     <plm-playlist class="d-contents" *ngIf="songs.length > 0"></plm-playlist>
   </div>
-  <!--
-    <footer class="row flex-edges" *ngIf="songs.length > 0">
-      <plm-player class="d-contents" [song]="songs[0]"></plm-player>
-    </footer>
-  -->
-  <footer></footer>
+
+  <footer
+    class="row flex-edges w-full padding-small margin-none"
+    *ngIf="selectedSong"
+  >
+    <plm-player class="d-contents" [song]="selectedSong"></plm-player>
+  </footer>
 </div>

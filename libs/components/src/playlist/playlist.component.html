@@ -40,6 +40,13 @@
         >
           <i class="fas fa-exclamation"></i>
         </button>
+        <button
+          class="btn-small"
+          (click)="onSelectSong(song)"
+          [disabled]="!song.validPath"
+        >
+          <i class="fas fa-play"></i>
+        </button>
       </td>
     </ng-container>
 

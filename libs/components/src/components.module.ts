@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { FilePickerModule } from './file-picker';
 import { FooterModule } from './footer';
 import { HeaderModule } from './header';
+import { PlayerModule } from './player';
 import { PlaylistModule } from './playlist';
 import { PvPlaylistModule } from './pv-playlist/pv-playlist.component';
 import { PvSongModule } from './pv-song/pv-song.component';
@@ -19,6 +20,7 @@ import { StepModule } from './step/step.component';
     PvSongModule,
     PvPlaylistModule,
     SettingsModule,
+    PlayerModule,
   ],
 })
 export class ComponentsModule {}
