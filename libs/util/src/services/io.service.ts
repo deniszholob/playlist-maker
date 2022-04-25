@@ -160,37 +160,53 @@ export class IoService {
   }
 
   public parsePlaylistSongs(data: string, path?: string): PlaylistSong[] {
-    // console.log(`parsePlaylistSongs() - `, data);
-    let songs: PlaylistSong[] = [];
+    // console.log(`parsePlaylistSongs() - `, data, path);
     // Dont care about carriage returns
     data = data.replace(/\r\n/g, '\n');
     // Split file line by song entry (1st line is the metadata, 2nd is song path)
-    const musicData: string[] = data.split('\n#EXTINF:');
+    const musicData: string[] = data.split('\n#EXTINF:') ?? [];
 
     // File should begin with this header
-    if (musicData[0] === '#EXTM3U') {
-      // Dont need the header anymore...
-      musicData.shift();
-      songs = musicData.map((music: string): PlaylistSong => {
-        // songData = [metaData, songPath]
-        const songData: string[] = music.split('\n');
-        // metaData is comma delimited
-        const metaData: string[] = songData[0].split(',');
-        let songPath: string = songData[1].replace('file:///', '');
-        songPath = decodeURIComponent(songPath);
-        songPath = slash(songPath);
-        return {
-          path: songPath,
-          seconds: Number(metaData[0]),
-          display: metaData[1]
-            ? String(metaData[1])
-            : getFileBaseNameFromPath(songPath),
-          validPath: false,
-        };
-      });
-      return songs;
+    if (musicData.shift() === '#EXTM3U') {
+      return musicData.map(
+        (song: string): PlaylistSong => this.parsePlaylistSong(song, path)
+      );
     }
-    throw new Error(`Invalid file ${path}, looking for "#EXTM3U" header`);
+    throw new Error(
+      `Invalid file "${path}", looking for "#EXTM3U" header followed by "#EXTINF" on the following line.`
+    );
+  }
+
+  public parsePlaylistSong(song: string, path?: string): PlaylistSong {
+    const [metaDataString, songPathString]: string[] = song.split('\n');
+
+    if (!metaDataString) {
+      throw new Error(
+        `Could not parse "${path}" playlist\nInvalid song "${song}" format.`
+      );
+    }
+    if (!songPathString) {
+      throw new Error(
+        `Could not parse "${path}" playlist\nSong "${song}" is missing path, or #EXTINF and path are on the same line.`
+      );
+    }
+
+    // metaData is comma delimited
+    const metaData: string[] = metaDataString.split(',');
+
+    // Web version will have the file prefix
+    let songPath: string = songPathString.replace('file:///', '');
+    songPath = decodeURIComponent(songPath);
+    songPath = slash(songPath);
+
+    return {
+      path: songPath,
+      seconds: Number(metaData[0]),
+      display: metaData[1]
+        ? String(metaData[1])
+        : getFileBaseNameFromPath(songPath),
+      validPath: false,
+    };
   }
 
   public readAudioFilesData(files: File[]): Observable<void> {
@@ -404,7 +420,7 @@ export class IoService {
   }
 
   // https://ourcodeworld.com/articles/read/1036/how-to-retrieve-the-duration-of-a-mp3-wav-audio-file-in-the-browser-with-javascript
-  // TODO: Use function
+  // TODO: Use this function
   private loadAudioData(data: string) {
     const audio = new Audio(data);
     audio.addEventListener('loadedmetadata', (e) => {
@@ -413,7 +429,7 @@ export class IoService {
 
       // example 12.3234 seconds
       console.log('The duration of the song is of: ' + duration + ' seconds');
-      console.log(`AUDIOS Event`, e);
+      console.log(`AUDIO Event`, e);
     });
 
     return fromEvent(audio, 'loadedmetadata').pipe(

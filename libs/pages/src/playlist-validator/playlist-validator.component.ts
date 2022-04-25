@@ -63,12 +63,16 @@ export class PlaylistValidatorComponent implements OnInit {
             // console.log('no playlists in folder');
             alert('no playlists in folder');
           }
+          this.appStoreService.setLoading(false);
         },
         (err) => {
           console.error(err);
           alert(err);
+          this.appStoreService.setLoading(false);
         },
-        () => this.appStoreService.setLoading(false)
+        () => {
+          this.appStoreService.setLoading(false);
+        }
       );
   }
 
@@ -88,12 +92,16 @@ export class PlaylistValidatorComponent implements OnInit {
           }
           // console.log(`invalidPlaylist`, this.invalidPlaylist);
           // console.log(`invalidPlaylistSong`, this.invalidPlaylistSong);
+          this.appStoreService.setLoading(false);
         },
         (err) => {
           console.error(err);
           alert(err);
+          this.appStoreService.setLoading(false);
         },
-        () => this.appStoreService.setLoading(false)
+        () => {
+          this.appStoreService.setLoading(false);
+        }
       );
   }
 
@@ -205,12 +213,16 @@ export class PlaylistValidatorComponent implements OnInit {
       .subscribe(
         (res) => {
           alert(res.toString().replace(/,/g, '\n'));
+          this.appStoreService.setLoading(false);
         },
         (err) => {
           console.error(err);
           alert('Error Saving Playlists');
+          this.appStoreService.setLoading(false);
         },
-        () => this.appStoreService.setLoading(false)
+        () => {
+          this.appStoreService.setLoading(false);
+        }
       );
   }
 }
