@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AppStoreService, Page, PlaylistStoreService } from '@plm/util';
 
+import packageJson from 'package.json';
+
 @Component({
   selector: 'plm-maker-root',
   templateUrl: './app.component.html',
   // styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  public appVersion: string = packageJson.version;
   public Page = Page;
   public app = this.appStoreService.getSnapshot();
   public settingsOpen = false;

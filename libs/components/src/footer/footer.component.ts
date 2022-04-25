@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component, Input, NgModule } from '@angular/core';
 
 const GITHUB = `https://github.com/deniszholob?tab=repositories`;
 
@@ -9,6 +9,9 @@ const GITHUB = `https://github.com/deniszholob?tab=repositories`;
   // styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent {
+  @Input()
+  public version = '';
+
   public GITHUB = GITHUB;
 }
 

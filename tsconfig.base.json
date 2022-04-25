@@ -22,7 +22,9 @@
     "strict": true,
     "noImplicitReturns": true,
     "strictNullChecks": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules", "tmp"],
   "angularCompilerOptions": {
