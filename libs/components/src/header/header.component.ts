@@ -78,11 +78,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .readAudioFilesData(files)
       .pipe(take(1))
       .subscribe(
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        () => {},
+        () => {
+          this.areSongsLoading = false;
+          this.appStoreService.setLoading(false);
+        },
         (err) => {
           console.error(err);
           alert(err);
+          this.areSongsLoading = false;
+          this.appStoreService.setLoading(false);
         },
         () => {
           this.areSongsLoading = false;
@@ -102,10 +106,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(
         (res) => {
           alert(res);
+          this.appStoreService.setLoading(false);
         },
         (err) => {
           console.error(err);
           alert('Error Saving Playlist');
+          this.appStoreService.setLoading(false);
         },
         () => {
           this.appStoreService.setLoading(false);
